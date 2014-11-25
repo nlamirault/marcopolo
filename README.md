@@ -8,7 +8,7 @@
 [![Coverage Status](https://coveralls.io/repos/nlamirault/marcopolo/badge.png)](https://coveralls.io/r/nlamirault/marcopolo)
 
 `marcopolo` provides :
-* a REST client to the [Docker][] API
+* a REST client to the Docker registry / Hub API
 
 Name comes from the [CMA CGM Marco Polo][] container ship
 

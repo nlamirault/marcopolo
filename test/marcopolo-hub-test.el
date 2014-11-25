@@ -29,6 +29,16 @@
   (let ((response (marcopolo--hub-login)))
     (should (string= "OK" response))))
 
+(ert-deftest test-marcopolo-hub-repository-images ()
+  (let ((response
+         (marcopolo--hub-repository-images "nlamirault" "scame")))
+    ;;(message "Response: %s" response)
+    (should (vectorp response))
+    (mapc (lambda (image)
+            ;;(message "Image: %s" image)
+            (should (not (s-blank? (assoc-default 'id image)))))
+          response)))
+
 
 (provide 'marcopolo-hub-test)
 ;;; marcopolo-hub-test.el ends here

@@ -29,5 +29,15 @@
   (marcopolo--perform-hub-request "GET" "users" nil 200))
 
 
+(defun marcopolo--hub-repository-images (namespace repository)
+  "Get the images for a user repository.
+`NAMESPACE' is the namespace for the repository
+`REPOSITORY' is the name for the repository"
+  (let ((uri (s-concat "repositories/" namespace "/" repository "/images")))
+    (marcopolo--perform-hub-request "GET"
+                                    uri
+                                    nil 200)))
+
+
 (provide 'marcopolo-hub)
 ;;; marcopolo-hub.el ends here
