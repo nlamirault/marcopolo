@@ -37,6 +37,21 @@
                                    nil
                                    200))
 
+(defun marcopolo--registry-repositories-tags (namespace repository)
+  "Get all of the tags for the given repository.
+`NAMESPACE' is the namespace for the repository
+`REPOSITORY' is the name for the repository"
+  (let ((uri (s-concat "repositories/" namespace "/" repository "/tags")))
+    (marcopolo--perform-http-request "GET" uri nil 200)))
+
+(defun marcopolo--registry-repository-tag-imageid (namespace repository tag)
+  "Get a tag for the given repository.
+`NAMESPACE' is the namespace for the repository
+`REPOSITORY' is the name for the repository
+`TAG' is the name of tag you want to get"
+  (let ((uri (s-concat "repositories/" namespace "/" repository "/tags/" tag)))
+    (marcopolo--perform-http-request "GET" uri nil 200)))
+
 
 (provide 'marcopolo-registry)
 ;;; marcopolo-registry.el ends here

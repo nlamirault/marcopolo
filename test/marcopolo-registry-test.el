@@ -41,5 +41,32 @@
     (should (string= "emacs" (assoc-default 'query response)))))
 
 
+(ert-deftest marcopolo-registry-repository-tags ()
+  (let ((response
+         (marcopolo--registry-repositories-tags "nlamirault" "scame")))
+    ;;(message "Response: %s" response)
+    (should (vectorp response))
+    (mapc (lambda (tag)
+            ;;(message "Tag: %s" tag)
+            (should (not (s-blank? (assoc-default 'name tag))))
+            (should (not (s-blank? (assoc-default 'layer tag))))
+            (when (string= "0.6.0" (assoc-default 'name tag))
+              (should (string= "114b7f0c" (assoc-default 'layer tag))))
+            )
+          response)
+    ))
+
+(ert-deftest marcopolo-registry-repository-tag ()
+  (let ((response
+         (marcopolo--registry-repository-tag-imageid "nlamirault" "scame" "0.6.0")))
+    ;; (message "Response: %s" response)
+    (should (vectorp response))
+    (mapc (lambda (r)
+            ;;(message "Tag: %s" tag)
+            (should (numberp (assoc-default 'pk r)))
+            (should (not (s-blank? (assoc-default 'id r)))))
+          response)
+    ))
+
 (provide 'marcopolo-registry-test)
 ;;; marcopolo-registry-test.el ends here
