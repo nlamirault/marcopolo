@@ -5,9 +5,10 @@
 .cask
 elpa
 .depend
-travis-pkg.el
+marcopolo-pkg.el
 packages/*
 TAGS
 .DS_STORE
 dist
 .vagrant/
+test/sandbox/

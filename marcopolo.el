@@ -58,6 +58,7 @@
 (require 'marcopolo-version)
 (require 'marcopolo-utils)
 (require 'marcopolo-registry)
+(require 'marcopolo-hub)
 
 
 ;;;###autoload

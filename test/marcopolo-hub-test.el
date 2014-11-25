@@ -1,4 +1,4 @@
-;;; marcopolo-version-test.el --- Tests for version information
+;;; marcopolo-hub-test.el --- Tests for Docker Hub client
 
 ;; Copyright (C) Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
@@ -21,17 +21,14 @@
 
 ;;; Code:
 
-(require 'pkg-info)
 
-(setq current-version "0.1.0")
-
-
-(ert-deftest test-marcopolo-library-version ()
-  (should (string= current-version (marcopolo--library-version))))
-
-(ert-deftest test-marcopolo-version ()
-  (should (string= current-version (marcopolo-version))))
+(require 'marcopolo)
 
 
-(provide 'marcopolo-version-test)
-;;; marcopolo-version-test.el ends here
+(ert-deftest test-marcopolo-hub-login ()
+  (let ((response (marcopolo--hub-login)))
+    (should (string= "OK" response))))
+
+
+(provide 'marcopolo-hub-test)
+;;; marcopolo-hub-test.el ends here

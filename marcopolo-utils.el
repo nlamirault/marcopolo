@@ -62,7 +62,7 @@ Defaults to `error'."
 
 ;; HTTP tools
 
-(defun marcopolo--get-rest-uri (uri)
+(defun marcopolo--get-registry-rest-uri (uri)
   "Retrieve the Docker registry complete url.
 `URI` is the api path."
   (let ((host (marcopolo--get-registry-host)))
@@ -70,36 +70,72 @@ Defaults to `error'."
         (s-concat host "/" marcopolo--docker-api-version "/" uri)
       (error (signal 'marcopolo-error '("Docker registry host unknown."))))))
 
+(defun marcopolo--get-hub-rest-uri (uri)
+  "Retrieve the Docker Hub complete url.
+`URI` is the api path."
+  (if marcopolo--hub-host
+      (s-concat marcopolo--hub-host "/" marcopolo--docker-api-version "/" uri)
+    (error (signal 'marcopolo-error '("Docker Hub host unknown.")))))
 
-(defun marcopolo--get-headers ()
-  "Generate HTTP headers for Marcopolo API."
+
+(defun marcopolo--get-registry-headers ()
+  "Generate HTTP headers for Marcopolo registry API."
   (let ((headers (list (cons "User-Agent"
                              (s-concat marcopolo--user-agent
                                        "/"
                                        (marcopolo--library-version))))))
-      headers))
+    headers))
+
+(defun marcopolo--get-hub-headers ()
+  "Generate HTTP headers for Marcopolo Hub API."
+  (let* ((auth (base64-encode-string
+                (s-concat (marcopolo--get-hub-username)
+                          ":"
+                          (marcopolo--get-hub-password))))
+         (headers
+          (list (cons "User-Agent"
+                      (s-concat marcopolo--user-agent
+                                "/"
+                                (marcopolo--library-version)))
+                (cons "Authorization" (concat "Basic " auth)))))
+
+    headers))
 
 
-(defun marcopolo--perform-http-request (method uri params status-code)
-  "Do a HTTP METHOD request using URI and PARAMS.
+(defun marcopolo--perform-http-request (method uri headers params status-code)
+  "Do a HTTP METHOD request using PATH and PARAMS.
 If HTTP return code is STATUS-CODE, send the response content otherwise
 raise an error."
-  (let ((uri (marcopolo--get-rest-uri uri))
-        (headers (marcopolo--get-headers)))
+  ;; (let ((uri (marcopolo--get-rest-uri path))
+  ;;       (headers (marcopolo--get-headers)))
 ;    (when marcopolo-debug
-    (message "[MarcoPolo] HTTP Request: %s %s %s" uri headers params)
-    (let ((response (request uri ;(marcopolo--get-rest-uri uri)
+  (message "[MarcoPolo] HTTP Request: %s %s %s" uri headers params)
+  (let ((response (request uri ;(marcopolo--get-rest-uri uri)
                            :type method
                            :headers headers ;(marcopolo--get-headers)
                            :sync t
                            :data params
                            :parser 'json-read)))
-      (if (= status-code (request-response-status-code response))
-          (request-response-data response)
-        (error
-         (signal 'marcopolo-http-error
-                 (list (request-response-status-code response)
-                       (request-response-data response))))))))
+    (if (= status-code (request-response-status-code response))
+        (request-response-data response)
+      (error
+       (signal 'marcopolo-http-error
+               (list (request-response-status-code response)
+                     (request-response-data response)))))))
+
+(defun marcopolo--perform-registry-request (method path params status-code)
+  (marcopolo--perform-http-request method
+                                   (marcopolo--get-registry-rest-uri path)
+                                   (marcopolo--get-registry-headers)
+                                   params
+                                   status-code))
+
+(defun marcopolo--perform-hub-request (method path params status-code)
+  (marcopolo--perform-http-request method
+                                   (marcopolo--get-hub-rest-uri path)
+                                   (marcopolo--get-hub-headers)
+                                   params
+                                   status-code))
 
 
 (provide 'marcopolo-utils)

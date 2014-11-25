@@ -25,12 +25,12 @@
 (require 'marcopolo)
 
 
-(ert-deftest marcopolo-registry-status ()
+(ert-deftest test-marcopolo-registry-status ()
   (let ((response (marcopolo--registry-status)))
     (should (eql t response))))
 
 
-(ert-deftest marcopolo-registry-search-ubuntu ()
+(ert-deftest test-marcopolo-registry-search-ubuntu ()
   (let ((response (marcopolo--registry-search "emacs")))
     ;;(message "Response: %s" response)
     (mapc (lambda (result)
@@ -41,7 +41,7 @@
     (should (string= "emacs" (assoc-default 'query response)))))
 
 
-(ert-deftest marcopolo-registry-repository-tags ()
+(ert-deftest test-marcopolo-registry-repository-tags ()
   (let ((response
          (marcopolo--registry-repositories-tags "nlamirault" "scame")))
     ;;(message "Response: %s" response)
@@ -56,7 +56,7 @@
           response)
     ))
 
-(ert-deftest marcopolo-registry-repository-tag ()
+(ert-deftest test-marcopolo-registry-repository-tag ()
   (let ((response
          (marcopolo--registry-repository-tag-imageid "nlamirault" "scame" "0.6.0")))
     ;; (message "Response: %s" response)

@@ -1,6 +1,6 @@
-;;; marcopolo-version-test.el --- Tests for version information
+;;; marcopolo-hub.el --- Docker Hub client
 
-;; Copyright (C) Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -21,17 +21,13 @@
 
 ;;; Code:
 
-(require 'pkg-info)
-
-(setq current-version "0.1.0")
+(require 'marcopolo-utils)
 
 
-(ert-deftest test-marcopolo-library-version ()
-  (should (string= current-version (marcopolo--library-version))))
-
-(ert-deftest test-marcopolo-version ()
-  (should (string= current-version (marcopolo-version))))
+(defun marcopolo--hub-login ()
+  "Try you login."
+  (marcopolo--perform-hub-request "GET" "users" nil 200))
 
 
-(provide 'marcopolo-version-test)
-;;; marcopolo-version-test.el ends here
+(provide 'marcopolo-hub)
+;;; marcopolo-hub.el ends here
