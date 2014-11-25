@@ -39,5 +39,15 @@
                                     nil 200)))
 
 
+;; (defun marcopolo--hub-create-repository (namespace repository)
+;;   "Create a user repository.
+;; `NAMESPACE' is the namespace for the repository
+;; `REPOSITORY' is the name for the repository"
+;;   (let ((uri (s-concat "repositories/" namespace "/" repository)))
+;;     (marcopolo--perform-hub-request "PUT"
+;;                                     uri
+;;                                     nil 200)))
+
+
 (provide 'marcopolo-hub)
 ;;; marcopolo-hub.el ends here

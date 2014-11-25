@@ -80,7 +80,9 @@ Defaults to `error'."
 
 (defun marcopolo--get-registry-headers ()
   "Generate HTTP headers for Marcopolo registry API."
-  (let ((headers (list (cons "User-Agent"
+  (let ((headers (list (cons "Accept" "application/json")
+                       (cons "Content-Type" "application/json")
+                       (cons "User-Agent"
                              (s-concat marcopolo--user-agent
                                        "/"
                                        (marcopolo--library-version))))))
@@ -93,7 +95,9 @@ Defaults to `error'."
                           ":"
                           (marcopolo--get-hub-password))))
          (headers
-          (list (cons "User-Agent"
+          (list (cons "Accept" "application/json")
+                (cons "Content-Type" "application/json")
+                (cons "User-Agent"
                       (s-concat marcopolo--user-agent
                                 "/"
                                 (marcopolo--library-version)))

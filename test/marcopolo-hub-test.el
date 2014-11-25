@@ -39,6 +39,11 @@
             (should (not (s-blank? (assoc-default 'id image)))))
           response)))
 
+;; (ert-deftest test-marcopolo-hub-create-repository ()
+;;   (let ((response
+;;          (marcopolo--hub-create-repository "nlamirault" "foo")))
+;;     (message "Response: %s" response)))
+
 
 (provide 'marcopolo-hub-test)
 ;;; marcopolo-hub-test.el ends here
