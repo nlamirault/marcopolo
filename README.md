@@ -2,7 +2,6 @@
 
 [![travis][badge-travis]][travis]
 [![drone][badge-drone]][drone]
-[![wercker][badge-wercker]][wercker]
 [![Melpa Status](http://melpa.milkbox.net/packages/marcopolo-badge.svg)](http://melpa.milkbox.net/#/marcopolo)
 [![MELPA Stable](http://stable.melpa.org/packages/marcopolo-badge.svg)](http://stable.melpa.org/#/marcopolo)
 [![Coverage Status](https://coveralls.io/repos/nlamirault/marcopolo/badge.png)](https://coveralls.io/r/nlamirault/marcopolo)
