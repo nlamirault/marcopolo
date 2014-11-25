@@ -34,6 +34,8 @@
 (setq debugger-batch-max-lines (+ 50 max-lisp-eval-depth)
       debug-on-error t)
 
+(setq marcopolo-debug t)
+
 (setenv "DOCKER_REGISTRY_HOST" "https://registry.hub.docker.com")
 
 (defvar username (getenv "HOME"))

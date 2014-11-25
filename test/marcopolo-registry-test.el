@@ -30,5 +30,16 @@
     (should (eql t response))))
 
 
+(ert-deftest marcopolo-registry-search-ubuntu ()
+  (let ((response (marcopolo--registry-search "emacs")))
+    ;;(message "Response: %s" response)
+    (mapc (lambda (result)
+            ;;(message "Result: %s" result)
+            (should (not (s-blank? (assoc-default 'name result)))))
+          (assoc-default 'results response))
+    (should (< 0 (assoc-default 'num_results response)))
+    (should (string= "emacs" (assoc-default 'query response)))))
+
+
 (provide 'marcopolo-registry-test)
 ;;; marcopolo-registry-test.el ends here

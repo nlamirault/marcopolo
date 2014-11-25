@@ -30,6 +30,9 @@
 (defconst marcopolo--docker-api-version "v1"
   "The Docker API version.")
 
+(defconst marcopolo-debug nil
+  "Enable or not some logs.")
+
 
 (defun marcopolo--get-registry-host ()
   "Retrieve the Docker registry host.

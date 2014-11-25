@@ -29,6 +29,14 @@
   (marcopolo--perform-http-request "GET" "_ping" nil 200))
 
 
+(defun marcopolo--registry-search (term)
+  "Search the Index given a search `TERM'."
+;;  (marcopolo--perform-http-request "GET" "search" (list (cons "q" term)) 200))
+  (marcopolo--perform-http-request "GET"
+                                   (s-concat "search?q=" term)
+                                   nil
+                                   200))
+
 
 (provide 'marcopolo-registry)
 ;;; marcopolo-registry.el ends here

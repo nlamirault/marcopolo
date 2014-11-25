@@ -84,18 +84,22 @@ Defaults to `error'."
   "Do a HTTP METHOD request using URI and PARAMS.
 If HTTP return code is STATUS-CODE, send the response content otherwise
 raise an error."
-  (let ((response (request (marcopolo--get-rest-uri uri)
+  (let ((uri (marcopolo--get-rest-uri uri))
+        (headers (marcopolo--get-headers)))
+;    (when marcopolo-debug
+    (message "[MarcoPolo] HTTP Request: %s %s %s" uri headers params)
+    (let ((response (request uri ;(marcopolo--get-rest-uri uri)
                            :type method
-                           :headers (marcopolo--get-headers)
+                           :headers headers ;(marcopolo--get-headers)
                            :sync t
                            :data params
                            :parser 'json-read)))
-    (if (= status-code (request-response-status-code response))
-        (request-response-data response)
-      (error
-       (signal 'marcopolo-http-error
-               (list (request-response-status-code response)
-                     (request-response-data response)))))))
+      (if (= status-code (request-response-status-code response))
+          (request-response-data response)
+        (error
+         (signal 'marcopolo-http-error
+                 (list (request-response-status-code response)
+                       (request-response-data response))))))))
 
 
 (provide 'marcopolo-utils)
