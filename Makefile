@@ -15,6 +15,8 @@
 
 APP = marcopolo
 
+SHELL = /bin/bash
+
 EMACS ?= emacs
 EMACSFLAGS = -L .
 CASK = cask
