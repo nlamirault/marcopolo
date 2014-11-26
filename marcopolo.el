@@ -56,9 +56,11 @@
 ;; MarcoPolo library
 
 (require 'marcopolo-version)
+(require 'marcopolo-ui)
 (require 'marcopolo-utils)
 (require 'marcopolo-registry)
 (require 'marcopolo-hub)
+(require 'marcopolo-mode)
 
 
 ;;;###autoload

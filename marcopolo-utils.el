@@ -110,10 +110,8 @@ Defaults to `error'."
   "Do a HTTP METHOD request using PATH and PARAMS.
 If HTTP return code is STATUS-CODE, send the response content otherwise
 raise an error."
-  ;; (let ((uri (marcopolo--get-rest-uri path))
-  ;;       (headers (marcopolo--get-headers)))
-;    (when marcopolo-debug
-  (message "[MarcoPolo] HTTP Request: %s %s %s" uri headers params)
+  (when marcopolo-debug
+    (message "[MarcoPolo] HTTP Request: %s %s %s" uri headers params))
   (let ((response (request uri ;(marcopolo--get-rest-uri uri)
                            :type method
                            :headers headers ;(marcopolo--get-headers)

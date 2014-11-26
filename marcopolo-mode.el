@@ -27,6 +27,122 @@
 ;; Travis library
 
 (require 'marcopolo-registry)
+(require 'marcopolo-ui)
+
+;; Images mode
+
+(defvar marcopolo-registry-image-mode-hook nil)
+
+(defvar marcopolo-registry-image-mode-map
+  (let ((map (make-keymap)))
+    map)
+  "Keymap for `marcopolo-registry-image-mode' major mode.")
+
+(define-derived-mode marcopolo-registry-image-mode tabulated-list-mode
+  "Docker registry image mode"
+  "Major mode for describing Docker image from registry."
+  :group 'marcopolo
+  (setq tabulated-list-format [("Entry"  20 t)
+                               ("Value"  0 nil)
+                               ])
+  (setq tabulated-list-padding 2)
+  (setq tabulated-list-sort-key (cons "Entry" nil))
+  (tabulated-list-init-header))
+
+(defun marcopolo--create-registry-image-entries (image)
+  "Create entries for 'tabulated-list-entries from `IMAGE'."
+  (list (list "Created"
+              (vector (colorize-term "Created" 'green)
+                      (cdr (assoc 'created image))))
+        (list "Author"
+              (vector (colorize-term "Author" 'green)
+                      (cdr (assoc 'author image))))
+        (list "OS"
+              (vector (colorize-term "OS" 'green)
+                      (cdr (assoc 'os image))))
+        (list "Arch"
+              (vector (colorize-term "Arch" 'green)
+                      (cdr (assoc 'architecture image))))
+        (list "Docker"
+              (vector (colorize-term "Docker" 'green)
+                      (cdr (assoc 'docker_version image))))
+        (list "ID"
+              (vector (colorize-term "ID" 'green)
+                      (cdr (assoc 'id image))))
+        (list "ID Parent"
+              (vector (colorize-term "ID Parent" 'green)
+                      (cdr (assoc 'parent image))))
+        ))
+
+(defvar marcopolo--registry-image-mode-history nil)
+
+;;;###autoload
+(defun marcopolo-registry-describe-image (image)
+  "Show Docker repositories  using `IMAGE' request."
+  (interactive
+   (list (read-from-minibuffer "Image (name:tag): "
+                               (car marcopolo--registry-image-mode-history)
+                               nil
+                               nil
+                               'marcopolo--registry-image-mode-history)))
+  (pop-to-buffer "*Marcopolo*" nil)
+  (let* ((input (s-split ":" image))
+         (repo (s-split "/" (car input))))
+    (setq tabulated-list-entries
+          (marcopolo--create-registry-image-entries
+           (marcopolo--registry-image-layer
+            (marcopolo--registry-repository-tag-imageid (car repo)
+                                                        (cadr repo)
+                                                        (cadr input))))))
+  (tabulated-list-print t))
+
+
+;; Tags mode
+
+(defvar marcopolo-registry-tag-mode-hook nil)
+
+(defvar marcopolo-registry-tag-mode-map
+  (let ((map (make-keymap)))
+    map)
+  "Keymap for `marcopolo-registry-tag-mode' major mode.")
+
+(define-derived-mode marcopolo-registry-tag-mode tabulated-list-mode
+  "Docker registry tag mode"
+  "Major mode for describing Docker tag from registry."
+  :group 'marcopolo
+  (setq tabulated-list-format [("Name"  20 t)
+                               ("ID"  0 nil)
+                               ])
+  (setq tabulated-list-padding 2)
+  (setq tabulated-list-sort-key (cons "Name" nil))
+  (tabulated-list-init-header))
+
+(defun marcopolo--create-registry-repository-tags-entries (tags)
+  "Create entries for 'tabulated-list-entries from `TAGS'."
+  (mapcar (lambda (tag)
+            (let ((name (format "%s" (car tag))))
+              (list name
+                    (vector (colorize-term name 'green) (cdr tag)))))
+          tags))
+
+(defvar marcopolo--repository-tag-mode-history nil)
+
+;;;###autoload
+(defun marcopolo-registry-repository-tags (repo)
+  "Show Docker repositories  using `REPO' request."
+  (interactive
+   (list (read-from-minibuffer "Repository: "
+                               (car marcopolo--repository-tag-mode-history)
+                               nil
+                               nil
+                               'marcopolo--repository-tag-mode-history)))
+  (pop-to-buffer "*Marcopolo*" nil)
+  (let ((input (s-split "/" repo)))
+    (setq tabulated-list-entries
+          (marcopolo--create-registry-repository-tags-entries
+           (marcopolo--registry-repositories-tags (car input) (cadr input)))))
+  (tabulated-list-print t))
+
 
 ;; Repositories mode
 
@@ -34,7 +150,8 @@
 
 (defvar marcopolo-registry-repositories-mode-map
   (let ((map (make-keymap)))
-    (define-key map (kbd "w") 'marcopolo--registry-status)
+    (define-key map (kbd "v") 'marcopolo--describe-image)
+    (define-key map (kbd "d") 'marcopolo--display-image)
     map)
   "Keymap for `marcopolo-registry-repositories-mode' major mode.")
 
@@ -42,7 +159,7 @@
   "Docker registry repositories mode"
   "Major mode for browsing Docker registry repositories."
   :group 'marcopolo
-  (setq tabulated-list-format [("Name"  25 t)
+  (setq tabulated-list-format [("Name"  35 t)
                                ("Description"  0 nil)
                                ])
   (setq tabulated-list-padding 2)
@@ -58,10 +175,14 @@
   (mapcar (lambda (result)
             (let ((name (cdr (assoc 'name result))))
               (list name
-                    (vector name ;(colorize-build-state name)
-                            (cdr (assoc 'description result))))))
+                    (vector (colorize-term name 'green)
+                            (let ((desc (cdr (assoc 'description result))))
+                              (if desc
+                                  desc
+                                ""))))))
           (cdar repositories)))
 
+;;;###autoload
 (defun marcopolo-registry-search (term)
   "Show Docker repositories  using `TERM' request."
   (interactive
@@ -76,8 +197,6 @@
         (marcopolo--create-registry-search-entries
          (marcopolo--registry-search term)))
   (tabulated-list-print t))
-
-
 
 
 

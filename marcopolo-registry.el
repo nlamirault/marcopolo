@@ -52,5 +52,12 @@
     (marcopolo--perform-registry-request "GET" uri nil 200)))
 
 
+(defun marcopolo--registry-image-layer (image-id)
+  "Get image layer.
+IMAGE-ID – the id for the layer you want to get"
+  (let ((uri (s-concat "images/" image-id "/json")))
+    (marcopolo--perform-registry-request "GET" uri nil 200)))
+
+
 (provide 'marcopolo-registry)
 ;;; marcopolo-registry.el ends here
