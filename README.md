@@ -34,7 +34,8 @@ or [Cask][]:
 
         M-x marcopolo-registry-search
 
-* Some screenshots here [img][img].
+* Some screenshots are available in *img* directory.
+
 
 ## Development
 
