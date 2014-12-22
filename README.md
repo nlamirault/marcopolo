@@ -24,7 +24,17 @@ or [Cask][]:
 
 ## Usage
 
+* Configure the Docker registry :
 
+        (setq marcopolo--registry-host "https://registry.hub.docker.com"
+              marcopolo--hub-username "xxx"
+              marcopolo--hub-password "yyy")
+
+* The API :
+
+        M-x marcopolo-registry-search
+
+* Some screenshots here [img][].
 
 ## Development
 
