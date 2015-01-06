@@ -1,6 +1,6 @@
 ;;; marcopolo-mode.el --- Major mode for Docker registry and hub
 
-;; Copyright (C) 2014 Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -97,7 +97,7 @@
   (tabulated-list-print t))
 
 
-;; Tags mode
+;; Repositoriy tags mode
 
 (defvar marcopolo-registry-tag-mode-hook nil)
 
@@ -120,9 +120,9 @@
 (defun marcopolo--create-registry-repository-tags-entries (tags)
   "Create entries for 'tabulated-list-entries from `TAGS'."
   (mapcar (lambda (tag)
-            (let ((name (format "%s" (car tag))))
+            (let ((name (format "%s" (cdar tag))))
               (list name
-                    (vector (colorize-term name 'green) (cdr tag)))))
+                    (vector (colorize-term name 'green) (cdadr tag)))))
           tags))
 
 (defvar marcopolo--repository-tag-mode-history nil)
@@ -137,6 +137,7 @@
                                nil
                                'marcopolo--repository-tag-mode-history)))
   (pop-to-buffer "*Marcopolo*" nil)
+  (marcopolo-registry-tag-mode)
   (let ((input (s-split "/" repo)))
     (setq tabulated-list-entries
           (marcopolo--create-registry-repository-tags-entries
@@ -166,8 +167,6 @@
   (setq tabulated-list-sort-key (cons "Name" nil))
   (tabulated-list-init-header))
 
-;; Repositories data
-
 (defvar marcopolo--repositories-mode-history nil)
 
 (defun marcopolo--create-registry-search-entries (repositories)
@@ -180,7 +179,7 @@
                               (if desc
                                   desc
                                 ""))))))
-          (cdar repositories)))
+          (cdr (fourth repositories))))
 
 ;;;###autoload
 (defun marcopolo-registry-search (term)

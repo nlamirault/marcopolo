@@ -5,7 +5,7 @@
 (source "marmalade" "http://marmalade-repo.org/packages/")
 
 (package-file "marcopolo.el")
-(files "*.el" (:exclude ".dir-locals.el"))
+(files "marcopolo*.el" (:exclude ".dir-locals.el"))
 
 (depends-on "helm" "1.0")
 

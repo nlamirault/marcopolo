@@ -107,7 +107,7 @@ Defaults to `error'."
 
 
 (defun marcopolo--perform-http-request (method uri headers params status-code)
-  "Do a HTTP METHOD request using PATH and PARAMS.
+  "Do a HTTP METHOD request using URI, HEADERS and PARAMS.
 If HTTP return code is STATUS-CODE, send the response content otherwise
 raise an error."
   (when marcopolo-debug

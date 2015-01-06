@@ -24,11 +24,17 @@ or [Cask][]:
 
 ## Usage
 
-* Configure the Docker registry :
+* Configure marcopolo in Elisp :
 
         (setq marcopolo--registry-host "https://registry.hub.docker.com"
               marcopolo--hub-username "xxx"
               marcopolo--hub-password "yyy")
+
+* Or using environment variables :
+
+        $ export DOCKER_REGISTRY_HOST="https://registry.hub.docker.com"
+        $ export DOCKER_HUB_USERNAME="xxx"
+        $ export DOCKER_HUB_PASSWORD="yyy"
 
 * The API :
 
@@ -51,9 +57,11 @@ management. Install it and retrieve dependencies :
 
 ### Tests
 
-* Launch unit tests :
+* Launch unit tests from shell:
 
         $ make clean test
+
+* You could use [Overseer][] to launch unit tests from Emacs
 
 
 ## Support / Contribute
@@ -76,6 +84,8 @@ See [LICENSE](LICENSE).
 
 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
+
+
 [marcopolo]: https://github.com/nlamirault/marcopolo
 [badge-license]: https://img.shields.io/badge/license-GPL_2-green.svg?style=flat
 [LICENSE]: https://github.com/nlamirault/marcopolo/blob/master/LICENSE
@@ -85,11 +95,12 @@ Nicolas Lamirault <nicolas.lamirault@gmail.com>
 [drone]: https://drone.io/github.com/nlamirault/marcopolo/latest
 [badge-wercker]: https://app.wercker.com/status/230e39942045191c79677ed663572c69/s
 [wercker]: https://app.wercker.com/project/bykey/230e39942045191c79677ed663572c69
+[Issue tracker]: https://github.com/nlamirault/marcopolo/issues
+
 [GNU Emacs]: https://www.gnu.org/software/emacs/
 [MELPA]: http://melpa.milkbox.net/
 [Cask]: http://cask.github.io/
-[Issue tracker]: https://github.com/nlamirault/marcopolo/issues
 [Helm]: https://github.com/emacs-helm/helm
-
+[Overseer]: https://github.com/tonini/overseer.el
 
 [CMA CGM Marco Polo]: http://en.wikipedia.org/wiki/CMA_CGM_Marco_Polo
