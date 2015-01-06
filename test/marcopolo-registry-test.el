@@ -1,6 +1,6 @@
 ;;; marcopolo-registry-test.el --- Tests for Docker registry client
 
-;; Copyright (C) Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -22,51 +22,55 @@
 ;;; Code:
 
 
-(require 'marcopolo)
+;;(require 'marcopolo)
 
 
 (ert-deftest test-marcopolo-registry-status ()
-  (let ((response (marcopolo--registry-status)))
-    (should (eql t response))))
+  (with-test-sandbox
+   (let ((response (marcopolo--registry-status)))
+     (should (eql t response)))))
 
 
 (ert-deftest test-marcopolo-registry-search-ubuntu ()
-  (let ((response (marcopolo--registry-search "emacs")))
-    ;;(message "Response: %s" response)
-    (mapc (lambda (result)
-            ;;(message "Result: %s" result)
-            (should (not (s-blank? (assoc-default 'name result)))))
-          (assoc-default 'results response))
-    (should (< 0 (assoc-default 'num_results response)))
-    (should (string= "emacs" (assoc-default 'query response)))))
+  (with-test-sandbox
+   (let ((response (marcopolo--registry-search "emacs")))
+     ;;(message "Response: %s" response)
+     (mapc (lambda (result)
+             ;;(message "Result: %s" result)
+             (should (not (s-blank? (assoc-default 'name result)))))
+           (assoc-default 'results response))
+     (should (< 0 (assoc-default 'num_results response)))
+     (should (string= "emacs" (assoc-default 'query response))))))
 
 
 (ert-deftest test-marcopolo-registry-repository-tags ()
-  (let ((response
-         (marcopolo--registry-repositories-tags "nlamirault" "scame")))
-    ;;(message "Response: %s" response)
-    (should (vectorp response))
-    (mapc (lambda (tag)
-            ;;(message "Tag: %s" tag)
-            (should (not (s-blank? (assoc-default 'name tag))))
-            (should (not (s-blank? (assoc-default 'layer tag))))
-            (when (string= "0.6.0" (assoc-default 'name tag))
-              (should (string= "114b7f0c" (assoc-default 'layer tag))))
-            )
-          response)
-    ))
+  (with-test-sandbox
+   (let ((response
+          (marcopolo--registry-repositories-tags "nlamirault" "scame")))
+     ;;(message "Response: %s" response)
+     (should (vectorp response))
+     (mapc (lambda (tag)
+             ;;(message "Tag: %s" tag)
+             (should (not (s-blank? (assoc-default 'name tag))))
+             (should (not (s-blank? (assoc-default 'layer tag))))
+             (when (string= "0.6.0" (assoc-default 'name tag))
+               (should (string= "114b7f0c" (assoc-default 'layer tag))))
+             )
+           response)
+     )))
 
 (ert-deftest test-marcopolo-registry-repository-tag ()
-  (let ((response
-         (marcopolo--registry-repository-tag-imageid "nlamirault" "scame" "0.6.0")))
-    ;; (message "Response: %s" response)
-    (should (vectorp response))
-    (mapc (lambda (r)
-            ;;(message "Tag: %s" tag)
-            (should (numberp (assoc-default 'pk r)))
-            (should (not (s-blank? (assoc-default 'id r)))))
-          response)
-    ))
+  (with-test-sandbox
+   (let ((response
+          (marcopolo--registry-repository-tag-imageid "nlamirault" "scame" "0.6.0")))
+     ;; (message "Response: %s" response)
+     (should (vectorp response))
+     (mapc (lambda (r)
+             ;;(message "Tag: %s" tag)
+             (should (numberp (assoc-default 'pk r)))
+             (should (not (s-blank? (assoc-default 'id r)))))
+           response)
+     )))
 
 (provide 'marcopolo-registry-test)
 ;;; marcopolo-registry-test.el ends here

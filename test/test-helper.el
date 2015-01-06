@@ -1,9 +1,9 @@
 ;; test-helper.el --- Test helpers for marcopolo.el
 
-;; Copyright (C) Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; Author: Nicolas Lamirault <nicolas.lamirault@gmail.com>
-;; Homepage: https://github.com/nlamirault/marcopolo
+;; Homepage: https://github.com/nlamirault/emacs-marcopolo
 
 ;;; License:
 
@@ -28,15 +28,12 @@
 
 (require 'ansi)
 (require 'cl) ;; http://emacs.stackexchange.com/questions/2864/symbols-function-definition-is-void-cl-macroexpand-all-when-trying-to-instal
+(require 'ert)
 (require 'f)
 (require 'undercover)
 
 (setq debugger-batch-max-lines (+ 50 max-lisp-eval-depth)
       debug-on-error t)
-
-(setq marcopolo-debug nil)
-
-(setenv "DOCKER_REGISTRY_HOST" "https://registry.hub.docker.com")
 
 (defvar username (getenv "HOME"))
 
@@ -59,7 +56,8 @@
             (when (string-match (s-concat username "/.emacs.d") path)
               (message (ansi-yellow "Suppression path %s" path))
               (setq load-path (delete path load-path))))
-        load-path))
+        load-path)
+  (add-to-list 'load-path default-directory))
 
 (defun load-unit-tests (path)
   "Load all unit test from PATH."
@@ -74,12 +72,30 @@
   (let ((path (s-concat marcopolo-source-dir file)))
     (message (ansi-yellow "[marcopolo] Load library from %s" path))
     (undercover "*.el" (:exclude "*-test.el"))
-    (require 'marcopolo))); path)))
+    (require 'marcopolo path)))
 
 
 (defun setup-marcopolo ()
   "Setup Marcopolo token from MARCOPOLO_TOKEN environment variable."
   (setq marcopolo-token-id (getenv "MARCOPOLO_TOKEN")))
+
+
+(defmacro with-test-sandbox (&rest body)
+  "Evaluate BODY in an empty sandbox directory."
+  `(unwind-protect
+       (condition-case nil ;ex
+           (let (;;(user-emacs-directory marcopolo-sandbox-path)
+                 (default-directory marcopolo-source-dir))
+             ;; (unless (f-dir? marcopolo-sandbox-path)
+             ;;   (f-mkdir marcopolo-sandbox-path))
+             (cleanup-load-path)
+             (load-library "/marcopolo.el")
+             (setup-marcopolo)
+             ,@body)
+         ;; (f-delete overseer-sandbox-path :force)))
+         )))
+         ;; (error
+         ;;  (message (ansi-red "[Scame] Error during unit tests : %s" ex))))))
 
 
 (provide 'test-helper)
