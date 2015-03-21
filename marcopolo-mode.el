@@ -21,181 +21,237 @@
 
 ;;; Code:
 
+(require 'widget)
 (require 'cl-lib)
-(require 'tabulated-list)
 
-;; Travis library
+(require 's)
 
+(require 'marcopolo-custom)
 (require 'marcopolo-registry)
 (require 'marcopolo-ui)
+(require 'marcopolo-utils)
 
-;; Images mode
 
-(defvar marcopolo-registry-image-mode-hook nil)
+;; Customization
 
-(defvar marcopolo-registry-image-mode-map
+(defgroup marcopolo-mode nil
+  "Customization group for `marcopolo-mode'."
+  :prefix "marcopolo-mode-"
+  :tag "Marcopolo Mode"
+  :group 'marcopolo)
+
+
+(defcustom marcopolo-buffer "*marcopolo*"
+  "The Marcopolo buffer name."
+  :type 'string
+  :group 'marcopolo-mode)
+
+(defcustom marcopolo-padding 2
+  "The number of columns used for padding on the left side of the buffer."
+  :type 'integer
+  :group 'marcopolo-mode)
+
+
+(defgroup marcopolo-mode-faces '((marcopolo-mode custom-group))
+  "Customization group for the faces of `marcopolo-mode'."
+  :prefix "marcopolo-mode-"
+  :tag "Marcopolo Mode Faces"
+  :group 'marcopolo-mode)
+
+(defface marcopolo-title
+  '((t :weight bold :inherit font-lock-string-name-face))
+  "Face used on the song render in the Marcopolo buffer."
+  :group 'marcopolo-mode-faces)
+
+(defface marcopolo-repository-name
+  '((t :weight bold :inherit font-lock-string-name-face))
+  "Face used on the song render in the Marcopolo buffer."
+  :group 'marcopolo-mode-faces)
+
+(defface marcopolo-repository-description
+  '((t :inherit font-lock-comment-face))
+  "Face used on the song render in the Marcopolo buffer"
+  :group 'marcopolo-mode-faces)
+
+(defface marcopolo-repository-misc
+  '((t :inherit font-lock-string-face))
+  "Face used on the song render in the Dionysos buffer"
+  :group 'marcopolo-mode-faces)
+
+;; UI tools
+
+
+(defun marcopolo--width ()
+  "Return the width of the renderable content."
+  (- (/ (frame-width) 2) (* marcopolo-padding 2)))
+
+
+(defun marcopolo--horizontal-rule ()
+  "Insert a horizontal rule into the buffer."
+  (widget-insert
+   (concat (make-string marcopolo-padding ?\s)
+	   (make-string (- (marcopolo--width) marcopolo-padding) ?-)
+	   (make-string marcopolo-padding ?\s)
+	   "\n")))
+
+(defun marcopolo--render-row (left right &optional width-right)
+  "Render a row with a `LEFT' and a `RIGHT' part.
+Optional argument `WIDTH-RIGHT' is the width of the right argument."
+  (let* ((width-right (or width-right (length (or right ""))))
+	 (width-left (- (marcopolo--width)
+			(- width-right 1)
+			(* 2 marcopolo-padding)))
+	 (padding (make-string marcopolo-padding ?\s)))
+    ;; (widget-insert (format
+    ;;     	    (format "%s%%-%s.%ss %%%s.%ss%s\n"
+    ;;     		    padding
+    ;;     		    width-left width-left
+    ;;     		    width-right width-right
+    ;;     		    padding)
+    ;;     	    left right))))
+    (widget-insert
+     (format "%s%s\n"
+             (s-pad-left (length left) " " left)
+             (s-pad-right (length right) " " right)))))
+
+;; Rendering
+
+
+(defun marcopolo--render-repository (repository)
+  "Render a `REPOSITORY' to the Marcopolo buffer."
+  (marcopolo--render-row
+   (propertize (marcopolo--assoc-cdr 'name repository)
+               'face 'marcopolo-repository-name)
+   (propertize (marcopolo--assoc-cdr 'is-trusted repository)
+               'face 'marcopolo-repository-misc))
+  (marcopolo--render-row
+    (propertize (s-trim (marcopolo--assoc-cdr 'description repository))
+                'face 'marcopolo-repository-description)
+    ""))
+
+(defun marcopolo--render-repository-informations (repository)
+  "Render all informatiosn about the `REPOSITORY'."
+  )
+
+
+(defun marcopolo--render-repositories (repositories)
+  "Render `REPOSITORIES'."
+  ;;(message "Repositories: %s" repositories)
+  (let ((start (point)))
+    (cl-loop
+     for n from 1 to (length repositories)
+     do (let ((repository (elt repositories (- n 1)))
+              (start (point)))
+          ;;(message "Repository : %s" repository)
+          (marcopolo--render-repository repository)
+          (put-text-property start (point) :marcopolo-repository repository)))
+    (widget-insert "\n")))
+
+
+
+;; Mode
+
+
+(defun marcopolo-kill-buffer ()
+  "Kill the `marcopolo-buffer' and delete the current window."
+  (interactive)
+  (let ((buffer (get-buffer marcopolo-buffer)))
+    (when (equal buffer (current-buffer))
+      (delete-window))
+    (when buffer
+      (kill-buffer buffer))))
+
+(defun marcopolo-describe-repository ()
+  "Display informations about the Docker repository at point."
+  (let ((repository (marcopolo-current-repository)))
+    (when repository
+      (marcopolo--render-repository-informations repository))))
+
+(defun marcopolo-current-repository ()
+  "Return the current repository at point."
+  (get-text-property (point) :marcopolo-repository))
+
+
+(defun marcopolo-next-repository ()
+  "Move point to the next Docker repository."
+  (interactive)
+  (let ((pos (next-single-property-change (point) :marcopolo-repository)))
+    (when pos
+      (goto-char pos)
+      (unless (marcopolo-current-repository)
+	(let ((pos (next-single-property-change pos :marcopolo-repository)))
+	  (if pos (goto-char pos)))))))
+
+
+(defun marcopolo-prev-repository ()
+  "Move point to the next Docker repository."
+  (interactive)
+  (let ((pos (previous-single-property-change (point) :marcopolo-repository)))
+    (when pos
+      (goto-char pos)
+      (unless (marcopolo-current-repository)
+	(let ((pos (previous-single-property-change pos :marcopolo-repository)))
+	  (if pos (goto-char pos)))))))
+
+
+(defmacro marcopolo--with-widget (title &rest body)
+  `(progn
+     (set-buffer (get-buffer-create marcopolo-buffer))
+     (switch-to-buffer-other-window marcopolo-buffer)
+     (kill-all-local-variables)
+     (let ((inhibit-read-only t))
+       (erase-buffer)
+       (remove-overlays)
+       (widget-insert (format "\n%s\n\n" ,title))
+       ,@body)
+     (use-local-map widget-keymap)
+     (widget-setup)
+     (marcopolo-mode)
+     (widget-minor-mode)
+     (goto-char 0)))
+
+
+(defvar marcopolo-mode-hook nil)
+
+(defvar marcopolo-mode-history nil)
+
+
+(defvar marcopolo-mode-map
   (let ((map (make-keymap)))
+    ;;(define-key map (kbd "i") 'marcopolo-describe-repository)
+    (define-key map (kbd "p") 'marcopolo-prev-repository)
+    (define-key map (kbd "n") 'marcopolo-next-repository)
+    (define-key map (kbd "q") 'marcopolo-kill-buffer)
     map)
-  "Keymap for `marcopolo-registry-image-mode' major mode.")
+  "Keymap for `marcopolo-mode' major mode.")
 
-(define-derived-mode marcopolo-registry-image-mode tabulated-list-mode
-  "Docker registry image mode"
-  "Major mode for describing Docker image from registry."
+
+(define-derived-mode marcopolo-mode tabulated-list-mode
+  "Marcopolo mode"
+  "Major mode for Marcopolo."
   :group 'marcopolo
-  (setq tabulated-list-format [("Entry"  20 t)
-                               ("Value"  0 nil)
-                               ])
-  (setq tabulated-list-padding 2)
-  (setq tabulated-list-sort-key (cons "Entry" nil))
-  (tabulated-list-init-header))
+  )
 
-(defun marcopolo--create-registry-image-entries (image)
-  "Create entries for 'tabulated-list-entries from `IMAGE'."
-  (list (list "Created"
-              (vector (colorize-term "Created" 'green)
-                      (cdr (assoc 'created image))))
-        (list "Author"
-              (vector (colorize-term "Author" 'green)
-                      (cdr (assoc 'author image))))
-        (list "OS"
-              (vector (colorize-term "OS" 'green)
-                      (cdr (assoc 'os image))))
-        (list "Arch"
-              (vector (colorize-term "Arch" 'green)
-                      (cdr (assoc 'architecture image))))
-        (list "Docker"
-              (vector (colorize-term "Docker" 'green)
-                      (cdr (assoc 'docker_version image))))
-        (list "ID"
-              (vector (colorize-term "ID" 'green)
-                      (cdr (assoc 'id image))))
-        (list "ID Parent"
-              (vector (colorize-term "ID Parent" 'green)
-                      (cdr (assoc 'parent image))))
-        ))
-
-(defvar marcopolo--registry-image-mode-history nil)
+;; API
 
 ;;;###autoload
-(defun marcopolo-registry-describe-image (image)
-  "Show Docker repositories  using `IMAGE' request."
-  (interactive
-   (list (read-from-minibuffer "Image (name:tag): "
-                               (car marcopolo--registry-image-mode-history)
-                               nil
-                               nil
-                               'marcopolo--registry-image-mode-history)))
-  (pop-to-buffer "*Marcopolo*" nil)
-  (let* ((input (s-split ":" image))
-         (repo (s-split "/" (car input))))
-    (setq tabulated-list-entries
-          (marcopolo--create-registry-image-entries
-           (marcopolo--registry-image-layer
-            (marcopolo--registry-repository-tag-imageid (car repo)
-                                                        (cadr repo)
-                                                        (cadr input))))))
-  (tabulated-list-print t))
-
-
-;; Repositoriy tags mode
-
-(defvar marcopolo-registry-tag-mode-hook nil)
-
-(defvar marcopolo-registry-tag-mode-map
-  (let ((map (make-keymap)))
-    map)
-  "Keymap for `marcopolo-registry-tag-mode' major mode.")
-
-(define-derived-mode marcopolo-registry-tag-mode tabulated-list-mode
-  "Docker registry tag mode"
-  "Major mode for describing Docker tag from registry."
-  :group 'marcopolo
-  (setq tabulated-list-format [("Name"  20 t)
-                               ("ID"  0 nil)
-                               ])
-  (setq tabulated-list-padding 2)
-  (setq tabulated-list-sort-key (cons "Name" nil))
-  (tabulated-list-init-header))
-
-(defun marcopolo--create-registry-repository-tags-entries (tags)
-  "Create entries for 'tabulated-list-entries from `TAGS'."
-  (mapcar (lambda (tag)
-            (let ((name (format "%s" (cdar tag))))
-              (list name
-                    (vector (colorize-term name 'green) (cdadr tag)))))
-          tags))
-
-(defvar marcopolo--repository-tag-mode-history nil)
-
-;;;###autoload
-(defun marcopolo-registry-repository-tags (repo)
-  "Show Docker repositories  using `REPO' request."
-  (interactive
-   (list (read-from-minibuffer "Repository: "
-                               (car marcopolo--repository-tag-mode-history)
-                               nil
-                               nil
-                               'marcopolo--repository-tag-mode-history)))
-  (pop-to-buffer "*Marcopolo*" nil)
-  (marcopolo-registry-tag-mode)
-  (let ((input (s-split "/" repo)))
-    (setq tabulated-list-entries
-          (marcopolo--create-registry-repository-tags-entries
-           (marcopolo--registry-repositories-tags (car input) (cadr input)))))
-  (tabulated-list-print t))
-
-
-;; Repositories mode
-
-(defvar marcopolo-registry-repositories-mode-hook nil)
-
-(defvar marcopolo-registry-repositories-mode-map
-  (let ((map (make-keymap)))
-    (define-key map (kbd "v") 'marcopolo--describe-image)
-    (define-key map (kbd "d") 'marcopolo--display-image)
-    map)
-  "Keymap for `marcopolo-registry-repositories-mode' major mode.")
-
-(define-derived-mode marcopolo-registry-repositories-mode tabulated-list-mode
-  "Docker registry repositories mode"
-  "Major mode for browsing Docker registry repositories."
-  :group 'marcopolo
-  (setq tabulated-list-format [("Name"  35 t)
-                               ("Description"  0 nil)
-                               ])
-  (setq tabulated-list-padding 2)
-  (setq tabulated-list-sort-key (cons "Name" nil))
-  (tabulated-list-init-header))
-
-(defvar marcopolo--repositories-mode-history nil)
-
-(defun marcopolo--create-registry-search-entries (repositories)
-  "Create entries for 'tabulated-list-entries from `REPOSITORIES'."
-  (mapcar (lambda (result)
-            (let ((name (cdr (assoc 'name result))))
-              (list name
-                    (vector (colorize-term name 'green)
-                            (let ((desc (cdr (assoc 'description result))))
-                              (if desc
-                                  desc
-                                ""))))))
-          (cdr (fourth repositories))))
-
-;;;###autoload
-(defun marcopolo-registry-search (term)
+(defun marcopolo-search (term)
   "Show Docker repositories  using `TERM' request."
   (interactive
    (list (read-from-minibuffer "Search: "
-                               (car marcopolo--repositories-mode-history)
+                               (car marcopolo-mode-history)
                                nil
                                nil
-                               'marcopolo--repositories-mode-history)))
-  (pop-to-buffer "*Marcopolo*" nil)
-  (marcopolo-registry-repositories-mode)
-  (setq tabulated-list-entries
-        (marcopolo--create-registry-search-entries
-         (marcopolo--registry-search term)))
-  (tabulated-list-print t))
+                               'marcopolo-mode-history)))
+  (interactive)
+  (marcopolo--with-widget
+   (propertize "Docker repositories :")
+   (condition-case err
+       (marcopolo--render-repositories
+        (marcopolo--assoc-cdr 'results (marcopolo--hub-search term)))
+     (marcopolo-error
+      (message "%s" (error-message-string err))))))
+
 
 
 

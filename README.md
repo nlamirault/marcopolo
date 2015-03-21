@@ -26,9 +26,15 @@ or [Cask][]:
 
 * Configure marcopolo in Elisp :
 
-        (setq marcopolo--registry-host "https://registry.hub.docker.com"
-              marcopolo--hub-username "xxx"
-              marcopolo--hub-password "yyy")
+        (setq marcopolo-registry-host "https://registry.hub.docker.com"
+              marcopolo-hub-username "xxx"
+              marcopolo-hub-password "yyy")
+
+* Or using environment variables :
+
+        $ export DOCKER_REGISTRY_HOST="https://registry.hub.docker.com"
+        $ export DOCKER_HUB_USERNAME="xxx"
+        $ export DOCKER_HUB_PASSWORD="yyy"
 
 * Or using environment variables :
 
@@ -38,7 +44,13 @@ or [Cask][]:
 
 * The API :
 
-        M-x marcopolo-registry-search
+        M-x marcopolo-search
+
+Keybinding           | Description
+---------------------|------------------------------------------------------------
+<kbd>n</kbd>         | Go to next repository
+<kbd>p</kbd>         | Go to previous repository
+<kbd>q</kbd>         | Kill marcopolo buffer
 
 * Some screenshots are available in *img* directory.
 

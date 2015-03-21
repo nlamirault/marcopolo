@@ -1,6 +1,6 @@
 ;;; marcopolo-hub.el --- Docker Hub client
 
-;; Copyright (C) 2014 Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -27,6 +27,11 @@
 (defun marcopolo--hub-login ()
   "Try you login."
   (marcopolo--perform-hub-request "GET" "users" nil 200))
+
+(defun marcopolo--hub-search (term)
+  "Search the Docker Hub given a search `TERM'."
+  (let ((uri (s-concat "search?q=" term)))
+    (marcopolo--perform-hub-request "GET" uri nil 200)))
 
 
 (defun marcopolo--hub-repository-images (namespace repository)

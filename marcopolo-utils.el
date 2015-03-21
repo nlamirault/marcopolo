@@ -139,6 +139,14 @@ raise an error."
                                    params
                                    status-code))
 
+;; Assoc tools
+
+(defun marcopolo--assoc-cdr (key list)
+  (let ((result (cdr (assoc key list))))
+    (if result
+        result
+      "")))
+
 
 (provide 'marcopolo-utils)
 ;;; marcopolo-utils.el ends here
