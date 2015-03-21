@@ -1,6 +1,6 @@
 ;;; marcopolo-version-test.el --- Tests for version information
 
-;; Copyright (C) Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -23,14 +23,16 @@
 
 (require 'pkg-info)
 
-(setq current-version "0.1.0")
+(setq current-version "0.2.0")
 
 
 (ert-deftest test-marcopolo-library-version ()
-  (should (string= current-version (marcopolo--library-version))))
+  (with-test-sandbox
+   (should (string= current-version (marcopolo--library-version)))))
 
 (ert-deftest test-marcopolo-version ()
-  (should (string= current-version (marcopolo-version))))
+  (with-test-sandbox
+   (should (string= current-version (marcopolo-version)))))
 
 
 (provide 'marcopolo-version-test)

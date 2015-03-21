@@ -1,6 +1,6 @@
 ;;; marcopolo-version.el --- Marcopolo Emacs client version
 
-;; Copyright (C) 2014 Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -23,12 +23,31 @@
 
 (require 'dash)
 (require 'pkg-info)
+(require 's)
 
 
 (defun marcopolo--library-version ()
   "Get the version in the emacs-marcopolo client header."
   (-when-let (version (pkg-info-library-version 'marcopolo))
     (pkg-info-format-version version)))
+
+
+;;;###autoload
+(defun marcopolo-version (&optional show-version)
+  "Get the marcopolo version as string.
+If called interactively or if SHOW-VERSION is non-nil, show the
+version in the echo area and the messages buffer.
+The returned string includes both, the version from package.el
+and the library version, if both a present and different.
+If the version number could not be determined, signal an error,
+if called interactively, or if SHOW-VERSION is non-nil, otherwise
+just return nil."
+  (interactive (list (not (or executing-kbd-macro noninteractive))))
+  (let* ((version (marcopolo--library-version)))
+    (unless version
+      (error "Could not find out marcopolo version"))
+    (message "marcopolo %s" version)
+    version))
 
 (provide 'marcopolo-version)
 ;;; marcopolo-version.el ends here

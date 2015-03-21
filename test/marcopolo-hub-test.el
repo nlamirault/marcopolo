@@ -1,6 +1,6 @@
 ;;; marcopolo-hub-test.el --- Tests for Docker Hub client
 
-;; Copyright (C) Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -22,22 +22,24 @@
 ;;; Code:
 
 
-(require 'marcopolo)
+;;(require 'marcopolo)
 
 
 (ert-deftest test-marcopolo-hub-login ()
-  (let ((response (marcopolo--hub-login)))
-    (should (string= "OK" response))))
+  (with-test-sandbox
+   (let ((response (marcopolo--hub-login)))
+     (should (string= "OK" response)))))
 
 (ert-deftest test-marcopolo-hub-repository-images ()
-  (let ((response
-         (marcopolo--hub-repository-images "nlamirault" "scame")))
-    ;;(message "Response: %s" response)
-    (should (vectorp response))
-    (mapc (lambda (image)
-            ;;(message "Image: %s" image)
-            (should (not (s-blank? (assoc-default 'id image)))))
-          response)))
+  (with-test-sandbox
+   (let ((response
+          (marcopolo--hub-repository-images "nlamirault" "scame")))
+     ;;(message "Response: %s" response)
+     (should (vectorp response))
+     (mapc (lambda (image)
+             ;;(message "Image: %s" image)
+             (should (not (s-blank? (assoc-default 'id image)))))
+           response))))
 
 ;; (ert-deftest test-marcopolo-hub-create-repository ()
 ;;   (let ((response

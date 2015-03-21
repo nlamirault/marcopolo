@@ -1,4 +1,4 @@
-# Copyright (C) 2014 Nicolas Lamirault <nicolas.lamirault@gmail.com>
+# Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ help:
 .PHONY: init
 init:
 	@echo -e "$(OK_COLOR)[$(APP)] Initialize environment$(NO_COLOR)"
-        @echo -e "Emacs version : $(EMACS) --version"
+	@echo -e "Emacs version : $(EMACS) --version"
 	@$(CASK) --dev install
 
 .PHONY: elpa
@@ -68,9 +68,7 @@ build : elpa $(OBJECTS)
 .PHONY: test
 test: build
 	@echo -e "$(OK_COLOR)[$(APP)] Unit tests$(NO_COLOR)"
-	$(CASK) exec $(EMACS) --no-site-file --no-site-lisp --batch \
-		$(EMACSFLAGS) \
-		-l test/run-tests
+	@$(CASK) exec ert-runner
 
 .PHONY: virtual-test
 virtual-test: check-env

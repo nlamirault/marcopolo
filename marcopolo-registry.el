@@ -1,6 +1,6 @@
 ;;; marcopolo-registry.el --- Docker registry client
 
-;; Copyright (C) 2014 Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -31,10 +31,8 @@
 
 (defun marcopolo--registry-search (term)
   "Search the Index given a search `TERM'."
-  (marcopolo--perform-registry-request "GET"
-                                       (s-concat "search?q=" term)
-                                       nil
-                                       200))
+  (let ((uri (s-concat "search?q=" term)))
+    (marcopolo--perform-registry-request "GET" uri nil 200)))
 
 (defun marcopolo--registry-repositories-tags (namespace repository)
   "Get all of the tags for the given repository.
@@ -51,10 +49,9 @@
   (let ((uri (s-concat "repositories/" namespace "/" repository "/tags/" tag)))
     (marcopolo--perform-registry-request "GET" uri nil 200)))
 
-
 (defun marcopolo--registry-image-layer (image-id)
   "Get image layer.
-IMAGE-ID – the id for the layer you want to get"
+`IMAGE-ID' – the id for the layer you want to get"
   (let ((uri (s-concat "images/" image-id "/json")))
     (marcopolo--perform-registry-request "GET" uri nil 200)))
 

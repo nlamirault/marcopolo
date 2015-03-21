@@ -2,12 +2,12 @@
 
 ;; Author: Nicolas Lamirault <nicolas.lamirault@gmail.com>
 ;; URL: https://github.com/nlamirault/marcopolo
-;; Version: 0.1.0
+;; Version: 0.2.0
 ;; Keywords: docker
 
 ;; Package-Requires: ((s "1.9.0") (dash "2.9.0") (pkg-info "0.5.0") (request "0.1.0"))
 
-;; Copyright (C) 2014 Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -39,47 +39,17 @@
 
 ;;; Usage:
 
-
-
 ;;; Code:
-
-(require 's)
-
-;; Customization
-
-(defgroup marcopolo nil
-  "Docker API client for Emacs."
-  :group 'applications
-  :link '(url-link :tag "Github" "https://github.com/nlamirault/marcopolo")
-  :link '(emacs-commentary-link :tag "Commentary" "marcopolo"))
 
 ;; MarcoPolo library
 
 (require 'marcopolo-version)
+(require 'marcopolo-custom)
 (require 'marcopolo-ui)
 (require 'marcopolo-utils)
 (require 'marcopolo-registry)
 (require 'marcopolo-hub)
 (require 'marcopolo-mode)
-
-
-;;;###autoload
-(defun marcopolo-version (&optional show-version)
-  "Get the marcopolo version as string.
-If called interactively or if SHOW-VERSION is non-nil, show the
-version in the echo area and the messages buffer.
-The returned string includes both, the version from package.el
-and the library version, if both a present and different.
-If the version number could not be determined, signal an error,
-if called interactively, or if SHOW-VERSION is non-nil, otherwise
-just return nil."
-  (interactive (list (not (or executing-kbd-macro noninteractive))))
-  (let* ((version (marcopolo--library-version)))
-    (unless version
-      (error "Could not find out marcopolo version"))
-    (message "marcopolo %s" version)
-    version))
-
 
 (provide 'marcopolo)
 ;;; marcopolo.el ends here
