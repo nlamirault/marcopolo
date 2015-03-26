@@ -1,6 +1,6 @@
 ;;; marcopolo-utils.el --- some tools
 
-;; Copyright (C) 2014 Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -73,8 +73,8 @@ Defaults to `error'."
 (defun marcopolo--get-hub-rest-uri (uri)
   "Retrieve the Docker Hub complete url.
 `URI` is the api path."
-  (if marcopolo--hub-host
-      (s-concat marcopolo--hub-host "/" marcopolo--docker-api-version "/" uri)
+  (if marcopolo-hub-host
+      (s-concat marcopolo-hub-host "/" marcopolo--docker-api-version "/" uri)
     (error (signal 'marcopolo-error '("Docker Hub host unknown.")))))
 
 

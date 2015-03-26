@@ -84,18 +84,11 @@
   "Evaluate BODY in an empty sandbox directory."
   `(unwind-protect
        (condition-case nil ;ex
-           (let (;;(user-emacs-directory marcopolo-sandbox-path)
-                 (default-directory marcopolo-source-dir))
-             ;; (unless (f-dir? marcopolo-sandbox-path)
-             ;;   (f-mkdir marcopolo-sandbox-path))
+           (let ((default-directory marcopolo-source-dir))
              (cleanup-load-path)
              (load-library "/marcopolo.el")
              (setup-marcopolo)
-             ,@body)
-         ;; (f-delete overseer-sandbox-path :force)))
-         )))
-         ;; (error
-         ;;  (message (ansi-red "[Scame] Error during unit tests : %s" ex))))))
+             ,@body))))
 
 
 (provide 'test-helper)
