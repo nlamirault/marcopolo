@@ -31,27 +31,37 @@
 (defconst marcopolo--docker-api-version "v1"
   "The Docker API version.")
 
+(defconst marcopolo--hub-username-key "DOCKER_HUB_USERNAME"
+  "Environment variable name for DOCKER_HUB_USERNAME.")
+
+(defconst marcopolo--hub-password-key "DOCKER_HUB_PASSWORD"
+  "Environment variable name for DOCKER_HUB_USERNAME.")
+
+(defconst marcopolo--registry-host-key "DOCKER_REGISTRY_HOST"
+  "Environment variable name for DOCKER_REGISTRY_HOST.")
 
 (defun marcopolo--get-registry-host ()
   "Retrieve the Docker registry host.
 Use `marcopolo-registry-host' or DOCKER_REGISTRY_HOST environment variable"
   (if marcopolo-registry-host
-      marcopolo-registry-host
-    (getenv "DOCKER_REGISTRY_HOST")))
+      (progn
+        (message "foo bar")
+        marcopolo-registry-host)
+    (getenv marcopolo--registry-host-key)))
 
 (defun marcopolo--get-hub-username ()
   "Retrieve the Docker Hub username.
 Use `marcopolo-hub-username' or DOCKER_HUB_USERNAME environment variable"
   (if marcopolo-hub-username
       marcopolo-hub-username
-    (getenv "DOCKER_HUB_USERNAME")))
+    (getenv marcopolo--hub-username-key)))
 
 (defun marcopolo--get-hub-password ()
   "Retrieve the Docker Hub password.
 Use `marcopolo-hub-password' or DOCKER_HUB_PASSWORD environment variable"
   (if marcopolo-hub-password
       marcopolo-hub-password
-    (getenv "DOCKER_HUB_PASSWORD")))
+    (getenv marcopolo--hub-password-key)))
 
 
 (provide 'marcopolo-api)

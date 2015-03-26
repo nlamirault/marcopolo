@@ -77,6 +77,7 @@
 
 (defun setup-marcopolo ()
   "Setup Marcopolo token from MARCOPOLO_TOKEN environment variable."
+  (setq marcopolo-debug nil)
   (setq marcopolo-token-id (getenv "MARCOPOLO_TOKEN")))
 
 

@@ -35,7 +35,7 @@
   :tags '(api)
   (with-test-sandbox
    (check-marcopolo-settings-from-environment
-    "DOCKER_HUB_USERNAME" "foo" 'marcopolo--get-hub-username)))
+    marcopolo--hub-username-key "foo" 'marcopolo--get-hub-username)))
 
 (ert-deftest test-marcopolo-get-username-from-conf ()
   :tags '(api)
@@ -48,7 +48,7 @@
   :tags '(api)
   (with-test-sandbox
    (check-marcopolo-settings-from-environment
-    "DOCKER_HUB_PASSWORD" "bar" 'marcopolo--get-hub-password)))
+    marcopolo--hub-password-key "bar" 'marcopolo--get-hub-password)))
 
 (ert-deftest test-marcopolo-get-password-from-conf ()
   :tags '(api)
@@ -61,7 +61,7 @@
   :tags '(api)
   (with-test-sandbox
    (check-marcopolo-settings-from-environment
-    "DOCKER_REGISTRY_HOST" "http://localhost:8989" 'marcopolo--get-registry-host)))
+    marcopolo--registry-host-key "http://localhost:8989" 'marcopolo--get-registry-host)))
 
 (ert-deftest test-marcopolo-get-registry-host-from-conf ()
   :tags '(api)

@@ -27,6 +27,7 @@
 (require 's)
 
 (require 'marcopolo-custom)
+(require 'marcopolo-hub)
 (require 'marcopolo-registry)
 (require 'marcopolo-ui)
 (require 'marcopolo-utils)
