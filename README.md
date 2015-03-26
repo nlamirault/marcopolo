@@ -26,25 +26,27 @@ or [Cask][]:
 
 * Configure marcopolo in Elisp :
 
-        (setq marcopolo-registry-host "https://registry.hub.docker.com"
-              marcopolo-hub-username "xxx"
-              marcopolo-hub-password "yyy")
+        (setq marcopolo-registry-host "https://docker.foobar.com"
+              marcopolo-registry-username "xxx"
+              marcopolo-registry-password "yyy"
+              marcopolo-hub-username "aaa"
+              marcopolo-hub-password "bbb")
 
 * Or using environment variables :
 
-        $ export DOCKER_REGISTRY_HOST="https://registry.hub.docker.com"
-        $ export DOCKER_HUB_USERNAME="xxx"
-        $ export DOCKER_HUB_PASSWORD="yyy"
-
-* Or using environment variables :
-
-        $ export DOCKER_REGISTRY_HOST="https://registry.hub.docker.com"
-        $ export DOCKER_HUB_USERNAME="xxx"
-        $ export DOCKER_HUB_PASSWORD="yyy"
+        $ export DOCKER_REGISTRY_HOST="https://docker.foobar.com"
+        $ export DOCKER_REGISTRY_USERNAME="xxx"
+        $ export DOCKER_REGISTRY_PASSWORD="yyy"
+        $ export DOCKER_HUB_USERNAME="aaa"
+        $ export DOCKER_HUB_PASSWORD="bbb"
 
 * The API :
 
-        M-x marcopolo-search
+        M-x marcopolo-hub-search
+
+        M-x marcopolo-registry-search
+
+* Keybindings in the *marcopolo-mode*:
 
 Keybinding           | Description
 ---------------------|------------------------------------------------------------
