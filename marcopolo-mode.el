@@ -236,15 +236,32 @@ Optional argument `WIDTH-RIGHT' is the width of the right argument."
 ;; API
 
 ;;;###autoload
-(defun marcopolo-search (term)
-  "Show Docker repositories  using `TERM' request."
+(defun marcopolo-registry-search (term)
+  "Search from Docker registry repositories using `TERM' request."
   (interactive
    (list (read-from-minibuffer "Search: "
                                (car marcopolo-mode-history)
                                nil
                                nil
                                'marcopolo-mode-history)))
-  (interactive)
+  (marcopolo--with-widget
+   (propertize "Docker repositories :")
+   (condition-case err
+       (marcopolo--render-repositories
+        (marcopolo--assoc-cdr 'results (marcopolo--registry-search term)))
+     (marcopolo-error
+      (message "%s" (error-message-string err))))))
+
+
+;;;###autoload
+(defun marcopolo-hub-search (term)
+  "Search from Docker Hub repositories using `TERM' request."
+  (interactive
+   (list (read-from-minibuffer "Search: "
+                               (car marcopolo-mode-history)
+                               nil
+                               nil
+                               'marcopolo-mode-history)))
   (marcopolo--with-widget
    (propertize "Docker repositories :")
    (condition-case err

@@ -40,14 +40,33 @@
 (defconst marcopolo--registry-host-key "DOCKER_REGISTRY_HOST"
   "Environment variable name for DOCKER_REGISTRY_HOST.")
 
+(defconst marcopolo--registry-username-key "DOCKER_REGISTRY_USERNAME"
+  "Environment variable name for DOCKER_REGISTRY_USERNAME.")
+
+(defconst marcopolo--registry-password-key "DOCKER_REGISTRY_PASSWORD"
+  "Environment variable name for DOCKER_REGISTRY_USERNAME.")
+
 (defun marcopolo--get-registry-host ()
   "Retrieve the Docker registry host.
 Use `marcopolo-registry-host' or DOCKER_REGISTRY_HOST environment variable"
   (if marcopolo-registry-host
-      (progn
-        (message "foo bar")
-        marcopolo-registry-host)
+      marcopolo-registry-host
     (getenv marcopolo--registry-host-key)))
+
+(defun marcopolo--get-registry-username ()
+  "Retrieve the Docker Registry username.
+Use `marcopolo-registry-username' or DOCKER_REGISTRY_USERNAME environment variable"
+  (if marcopolo-registry-username
+      marcopolo-registry-username
+    (getenv marcopolo--registry-username-key)))
+
+(defun marcopolo--get-registry-password ()
+  "Retrieve the Docker Registry password.
+Use `marcopolo-registry-password' or DOCKER_REGISTRY_PASSWORD environment variable"
+  (if marcopolo-registry-password
+      marcopolo-registry-password
+    (getenv marcopolo--registry-password-key)))
+
 
 (defun marcopolo--get-hub-username ()
   "Retrieve the Docker Hub username.

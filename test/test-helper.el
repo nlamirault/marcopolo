@@ -77,19 +77,33 @@
 
 (defun setup-marcopolo ()
   "Setup Marcopolo token from MARCOPOLO_TOKEN environment variable."
-  (setq marcopolo-debug nil)
+  (setq marcopolo-debug t)
   (setq marcopolo-token-id (getenv "MARCOPOLO_TOKEN")))
+
+
+(defmacro with-docker-env (&rest body)
+  `(let ((registry (getenv "DOCKER_REGISTRY_HOST"))
+         (username (getenv "DOCKER_REGISTRY_USERNAME"))
+         (password (getenv "DOCKER_REGISTRY_PASSWORD")))
+     (unwind-protect
+         (setenv "DOCKER_REGISTRY_HOST" "https://registry.hub.docker.com")
+         ,@body
+       (setenv "DOCKER_REGISTRY_HOST" registry)
+       (setenv "DOCKER_REGISTRY_USERNAME" username)
+       (setenv "DOCKER_REGISTRY_PASSWORD" password))))
 
 
 (defmacro with-test-sandbox (&rest body)
   "Evaluate BODY in an empty sandbox directory."
-  `(unwind-protect
-       (condition-case nil ;ex
-           (let ((default-directory marcopolo-source-dir))
-             (cleanup-load-path)
-             (load-library "/marcopolo.el")
-             (setup-marcopolo)
-             ,@body))))
+  `(with-docker-env
+    (condition-case nil ;ex
+        (let ((default-directory marcopolo-source-dir))
+          (cleanup-load-path)
+          (load-library "/marcopolo.el")
+          (setup-marcopolo)
+          ,@body))))
+
+
 
 
 (provide 'test-helper)
