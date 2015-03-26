@@ -1,5 +1,10 @@
 # marcopolo ChangeLog
 
+# Version 0.3.0 (26/03/2015)
+
+- Refactoring authentication for Docker Hub and registry
+- Add environment variables for own Docker registry
+
 # Version 0.2.0 (21/03/2015)
 
 - Update *marcopolo-mode*

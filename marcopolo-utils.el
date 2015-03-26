@@ -1,6 +1,6 @@
 ;;; marcopolo-utils.el --- some tools
 
-;; Copyright (C) 2014 Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -73,38 +73,48 @@ Defaults to `error'."
 (defun marcopolo--get-hub-rest-uri (uri)
   "Retrieve the Docker Hub complete url.
 `URI` is the api path."
-  (if marcopolo--hub-host
-      (s-concat marcopolo--hub-host "/" marcopolo--docker-api-version "/" uri)
+  (if marcopolo-hub-host
+      (s-concat marcopolo-hub-host "/" marcopolo--docker-api-version "/" uri)
     (error (signal 'marcopolo-error '("Docker Hub host unknown.")))))
+
+
+(defun marcopolo--get-headers (&optional auth)
+  "Generate HTTP headers for Docker HUB or Registry.
+If `AUTH' is non nil, add a BASIC-AUTH header."
+  (let ((headers
+         (list (cons "Accept" "application/json")
+               (cons "Content-Type" "application/json")
+               (cons "User-Agent"
+                     (s-concat marcopolo--user-agent
+                               "/"
+                               (marcopolo--library-version))))))
+    (if  auth
+      (cons (cons "Authorization" (concat "Basic " auth))
+            headers)
+      headers)))
+
+
+;; [MarcoPolo] HTTP Request: https://index.docker.io/v1/repositories/nlamirault/scame/images ((Authorization . Basic bmxhbWlyYXVsdDo6UGVyQHZl) (Accept . application/json) (Content-Type . application/json) (User-Agent . marcopolo/0.3.0)) nil
 
 
 (defun marcopolo--get-registry-headers ()
   "Generate HTTP headers for Marcopolo registry API."
-  (let ((headers (list (cons "Accept" "application/json")
-                       (cons "Content-Type" "application/json")
-                       (cons "User-Agent"
-                             (s-concat marcopolo--user-agent
-                                       "/"
-                                       (marcopolo--library-version))))))
-    headers))
+  (if (and (marcopolo--get-registry-username)
+           (marcopolo--get-registry-password))
+      (marcopolo--get-headers
+       (base64-encode-string
+        (s-concat (marcopolo--get-registry-username)
+                  ":"
+                  (marcopolo--get-registry-password))))
+    (marcopolo--get-headers nil)))
 
 (defun marcopolo--get-hub-headers ()
   "Generate HTTP headers for Marcopolo Hub API."
-  (let* ((auth (base64-encode-string
-                (s-concat (marcopolo--get-hub-username)
-                          ":"
-                          (marcopolo--get-hub-password))))
-         (headers
-          (list (cons "Accept" "application/json")
-                (cons "Content-Type" "application/json")
-                (cons "User-Agent"
-                      (s-concat marcopolo--user-agent
-                                "/"
-                                (marcopolo--library-version)))
-                (cons "Authorization" (concat "Basic " auth)))))
-
-    headers))
-
+  (marcopolo--get-headers
+   (base64-encode-string
+    (s-concat (marcopolo--get-hub-username)
+              ":"
+              (marcopolo--get-hub-password)))))
 
 (defun marcopolo--perform-http-request (method uri headers params status-code)
   "Do a HTTP METHOD request using URI, HEADERS and PARAMS.
@@ -123,7 +133,7 @@ raise an error."
       (error
        (signal 'marcopolo-http-error
                (list (request-response-status-code response)
-                     (request-response-data response)))))))
+                     (request-response-error-thrown response)))))))
 
 (defun marcopolo--perform-registry-request (method path params status-code)
   (marcopolo--perform-http-request method

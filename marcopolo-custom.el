@@ -35,11 +35,6 @@
   :type 'string
   :group 'marcopolo)
 
-(defcustom marcopolo-registry-host nil
-  "The Docker registry API endpoint."
-  :type 'string
-  :group 'marcopolo)
-
 (defcustom marcopolo-hub-username nil
   "Username for the Docker Hub."
   :type 'string
@@ -50,7 +45,22 @@
   :type 'string
   :group 'marcopolo)
 
-(defcustom marcopolo-debug nil
+(defcustom marcopolo-registry-host nil
+  "The Docker registry API endpoint."
+  :type 'string
+  :group 'marcopolo)
+
+(defcustom marcopolo-registry-username nil
+  "Username for the Docker Registry."
+  :type 'string
+  :group 'marcopolo)
+
+(defcustom marcopolo-registry-password nil
+  "Password for the Docker Registry."
+  :type 'string
+  :group 'marcopolo)
+
+(defcustom marcopolo-debug t
   "Enable or not some logs."
   :type 'string
   :group 'marcopolo)

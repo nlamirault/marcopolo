@@ -2,7 +2,7 @@
 
 ;; Author: Nicolas Lamirault <nicolas.lamirault@gmail.com>
 ;; URL: https://github.com/nlamirault/marcopolo
-;; Version: 0.2.0
+;; Version: 0.3.0
 ;; Keywords: docker
 
 ;; Package-Requires: ((s "1.9.0") (dash "2.9.0") (pkg-info "0.5.0") (request "0.1.0"))
@@ -47,6 +47,7 @@
 (require 'marcopolo-custom)
 (require 'marcopolo-ui)
 (require 'marcopolo-utils)
+(require 'marcopolo-api)
 (require 'marcopolo-registry)
 (require 'marcopolo-hub)
 (require 'marcopolo-mode)

@@ -31,27 +31,56 @@
 (defconst marcopolo--docker-api-version "v1"
   "The Docker API version.")
 
+(defconst marcopolo--hub-username-key "DOCKER_HUB_USERNAME"
+  "Environment variable name for DOCKER_HUB_USERNAME.")
+
+(defconst marcopolo--hub-password-key "DOCKER_HUB_PASSWORD"
+  "Environment variable name for DOCKER_HUB_USERNAME.")
+
+(defconst marcopolo--registry-host-key "DOCKER_REGISTRY_HOST"
+  "Environment variable name for DOCKER_REGISTRY_HOST.")
+
+(defconst marcopolo--registry-username-key "DOCKER_REGISTRY_USERNAME"
+  "Environment variable name for DOCKER_REGISTRY_USERNAME.")
+
+(defconst marcopolo--registry-password-key "DOCKER_REGISTRY_PASSWORD"
+  "Environment variable name for DOCKER_REGISTRY_USERNAME.")
 
 (defun marcopolo--get-registry-host ()
   "Retrieve the Docker registry host.
 Use `marcopolo-registry-host' or DOCKER_REGISTRY_HOST environment variable"
   (if marcopolo-registry-host
       marcopolo-registry-host
-    (getenv "DOCKER_REGISTRY_HOST")))
+    (getenv marcopolo--registry-host-key)))
+
+(defun marcopolo--get-registry-username ()
+  "Retrieve the Docker Registry username.
+Use `marcopolo-registry-username' or DOCKER_REGISTRY_USERNAME environment variable"
+  (if marcopolo-registry-username
+      marcopolo-registry-username
+    (getenv marcopolo--registry-username-key)))
+
+(defun marcopolo--get-registry-password ()
+  "Retrieve the Docker Registry password.
+Use `marcopolo-registry-password' or DOCKER_REGISTRY_PASSWORD environment variable"
+  (if marcopolo-registry-password
+      marcopolo-registry-password
+    (getenv marcopolo--registry-password-key)))
+
 
 (defun marcopolo--get-hub-username ()
   "Retrieve the Docker Hub username.
 Use `marcopolo-hub-username' or DOCKER_HUB_USERNAME environment variable"
   (if marcopolo-hub-username
       marcopolo-hub-username
-    (getenv "DOCKER_HUB_USERNAME")))
+    (getenv marcopolo--hub-username-key)))
 
 (defun marcopolo--get-hub-password ()
   "Retrieve the Docker Hub password.
 Use `marcopolo-hub-password' or DOCKER_HUB_PASSWORD environment variable"
   (if marcopolo-hub-password
       marcopolo-hub-password
-    (getenv "DOCKER_HUB_PASSWORD")))
+    (getenv marcopolo--hub-password-key)))
 
 
 (provide 'marcopolo-api)

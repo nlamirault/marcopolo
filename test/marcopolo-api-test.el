@@ -32,36 +32,42 @@
       (setenv var backup))))
 
 (ert-deftest test-marcopolo-get-username-from-environment ()
+  :tags '(api)
   (with-test-sandbox
    (check-marcopolo-settings-from-environment
-    "DOCKER_HUB_USERNAME" "foo" 'marcopolo--get-hub-username)))
+    marcopolo--hub-username-key "foo" 'marcopolo--get-hub-username)))
 
 (ert-deftest test-marcopolo-get-username-from-conf ()
+  :tags '(api)
   (with-test-sandbox
    (let* ((value "foo")
-          (marcopolo--hub-username value))
+          (marcopolo-hub-username value))
      (should (string= value (marcopolo--get-hub-username))))))
 
 (ert-deftest test-marcopolo-get-password-from-environment ()
+  :tags '(api)
   (with-test-sandbox
    (check-marcopolo-settings-from-environment
-    "DOCKER_HUB_PASSWORD" "bar" 'marcopolo--get-hub-password)))
+    marcopolo--hub-password-key "bar" 'marcopolo--get-hub-password)))
 
 (ert-deftest test-marcopolo-get-password-from-conf ()
+  :tags '(api)
   (with-test-sandbox
    (let* ((value "bar")
-          (marcopolo--hub-password value))
+          (marcopolo-hub-password value))
      (should (string= value (marcopolo--get-hub-password))))))
 
 (ert-deftest test-marcopolo-get-registry-host-from-environment ()
+  :tags '(api)
   (with-test-sandbox
    (check-marcopolo-settings-from-environment
-    "DOCKER_REGISTRY_HOST" "http://localhost:8989" 'marcopolo--get-registry-host)))
+    marcopolo--registry-host-key "http://localhost:8989" 'marcopolo--get-registry-host)))
 
 (ert-deftest test-marcopolo-get-registry-host-from-conf ()
+  :tags '(api)
   (with-test-sandbox
    (let* ((value "http://localhost:7878")
-          (marcopolo--registry-host value))
+          (marcopolo-registry-host value))
      (should (string= value (marcopolo--get-registry-host))))))
 
 (provide 'marcopolo-api-test)

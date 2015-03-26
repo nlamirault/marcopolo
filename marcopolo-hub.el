@@ -28,6 +28,7 @@
   "Try you login."
   (marcopolo--perform-hub-request "GET" "users" nil 200))
 
+
 (defun marcopolo--hub-search (term)
   "Search the Docker Hub given a search `TERM'."
   (let ((uri (s-concat "search?q=" term)))
