@@ -24,36 +24,36 @@
 (require 'marcopolo-utils)
 
 
-(defun marcopolo--registry-status ()
-  "Status check for registry."
-  (marcopolo--perform-registry-request "GET" "_ping" nil 200))
+;; (defun marcopolo--registry-status ()
+;;   "Status check for registry."
+;;   (marcopolo--perform-registry-request "GET" "_ping" nil 200))
 
 
-(defun marcopolo--registry-search (term)
-  "Search the Index given a search `TERM'."
-  (let ((uri (s-concat "search?q=" term)))
-    (marcopolo--perform-registry-request "GET" uri nil 200)))
+;; ;; (defun marcopolo--registry-search (term)
+;; ;;   "Search the Index given a search `TERM'."
+;; ;;   (let ((uri (s-concat "search?q=" term)))
+;; ;;     (marcopolo--perform-registry-request "GET" uri nil 200)))
 
-(defun marcopolo--registry-repositories-tags (namespace repository)
-  "Get all of the tags for the given repository.
-`NAMESPACE' is the namespace for the repository
-`REPOSITORY' is the name for the repository"
-  (let ((uri (s-concat "repositories/" namespace "/" repository "/tags")))
-    (marcopolo--perform-registry-request "GET" uri nil 200)))
+;; (defun marcopolo--registry-repositories-tags (namespace repository)
+;;   "Get all of the tags for the given repository.
+;; `NAMESPACE' is the namespace for the repository
+;; `REPOSITORY' is the name for the repository"
+;;   (let ((uri (s-concat "repositories/" namespace "/" repository "/tags")))
+;;     (marcopolo--perform-registry-request "GET" uri nil 200)))
 
-(defun marcopolo--registry-repository-tag-imageid (namespace repository tag)
-  "Get a tag for the given repository.
-`NAMESPACE' is the namespace for the repository
-`REPOSITORY' is the name for the repository
-`TAG' is the name of tag you want to get"
-  (let ((uri (s-concat "repositories/" namespace "/" repository "/tags/" tag)))
-    (marcopolo--perform-registry-request "GET" uri nil 200)))
+;; (defun marcopolo--registry-repository-tag-imageid (namespace repository tag)
+;;   "Get a tag for the given repository.
+;; `NAMESPACE' is the namespace for the repository
+;; `REPOSITORY' is the name for the repository
+;; `TAG' is the name of tag you want to get"
+;;   (let ((uri (s-concat "repositories/" namespace "/" repository "/tags/" tag)))
+;;     (marcopolo--perform-registry-request "GET" uri nil 200)))
 
-(defun marcopolo--registry-image-layer (image-id)
-  "Get image layer.
-`IMAGE-ID' – the id for the layer you want to get"
-  (let ((uri (s-concat "images/" image-id "/json")))
-    (marcopolo--perform-registry-request "GET" uri nil 200)))
+;; (defun marcopolo--registry-image-layer (image-id)
+;;   "Get image layer.
+;; `IMAGE-ID' – the id for the layer you want to get"
+;;   (let ((uri (s-concat "images/" image-id "/json")))
+;;     (marcopolo--perform-registry-request "GET" uri nil 200)))
 
 
 (provide 'marcopolo-registry)

@@ -22,66 +22,53 @@
 ;;; Code:
 
 
-(require 'marcopolo-custom)
+(require 'marcopolo-utils)
 
 
-(defconst marcopolo--user-agent "marcopolo"
-  "The user agent for Marcopolo.")
+(defun marcopolo-search (term site)
+  "Search `TERM' on `SITE' (which is 'registry or 'hub)."
+  (let ((uri (s-concat "search?q=" term)))
+    (marcopolo--request "GET" uri nil 200 site)))
 
-(defconst marcopolo--docker-api-version "v1"
-  "The Docker API version.")
+(defun marcopolo-repositories-tags (namespace repository site)
+  "Get all of the tags for the given repository.
+`NAMESPACE' is the namespace for the repository
+`REPOSITORY' is the name for the repository
+`SITE' could be 'registry or 'hub"
+  (let ((uri (s-concat "repositories/" namespace "/" repository "/tags")))
+    (marcopolo--request "GET" uri nil 200 site)))
 
-(defconst marcopolo--hub-username-key "DOCKER_HUB_USERNAME"
-  "Environment variable name for DOCKER_HUB_USERNAME.")
+(defun marcopolo-repository-images (namespace repository site)
+  "Get the images for a user repository.
+`NAMESPACE' is the namespace for the repository
+`REPOSITORY' is the name for the repository
+`SITE' could be 'registry or 'hub"
+  (let ((uri (s-concat "repositories/" namespace "/" repository "/images")))
+    (marcopolo--request "GET" uri nil 200 site)))
 
-(defconst marcopolo--hub-password-key "DOCKER_HUB_PASSWORD"
-  "Environment variable name for DOCKER_HUB_USERNAME.")
+(defun marcopolo-repository-tag-imageid (namespace repository tag site)
+  "Get a tag for the given repository.
+`NAMESPACE' is the namespace for the repository
+`REPOSITORY' is the name for the repository
+`TAG' is the name of tag you want to get
+`SITE' could be 'registry or 'hub"
+  (let ((uri (s-concat "repositories/" namespace "/" repository "/tags/" tag)))
+    (marcopolo--request "GET" uri nil 200 site)))
 
-(defconst marcopolo--registry-host-key "DOCKER_REGISTRY_HOST"
-  "Environment variable name for DOCKER_REGISTRY_HOST.")
+(defun marcopolo-image-layer (image-id site)
+  "Get image layer.
+`IMAGE-ID' – the id for the layer you want to get
+`SITE' could be 'registry or 'hub"
+  (let ((uri (s-concat "images/" image-id "/json")))
+    (marcopolo--request "GET" uri nil 200 site)))
 
-(defconst marcopolo--registry-username-key "DOCKER_REGISTRY_USERNAME"
-  "Environment variable name for DOCKER_REGISTRY_USERNAME.")
+(defun marcopolo-hub-login ()
+  "Try you login."
+  (marcopolo--request "GET" "users" nil 200 'hub))
 
-(defconst marcopolo--registry-password-key "DOCKER_REGISTRY_PASSWORD"
-  "Environment variable name for DOCKER_REGISTRY_USERNAME.")
-
-(defun marcopolo--get-registry-host ()
-  "Retrieve the Docker registry host.
-Use `marcopolo-registry-host' or DOCKER_REGISTRY_HOST environment variable"
-  (if marcopolo-registry-host
-      marcopolo-registry-host
-    (getenv marcopolo--registry-host-key)))
-
-(defun marcopolo--get-registry-username ()
-  "Retrieve the Docker Registry username.
-Use `marcopolo-registry-username' or DOCKER_REGISTRY_USERNAME environment variable"
-  (if marcopolo-registry-username
-      marcopolo-registry-username
-    (getenv marcopolo--registry-username-key)))
-
-(defun marcopolo--get-registry-password ()
-  "Retrieve the Docker Registry password.
-Use `marcopolo-registry-password' or DOCKER_REGISTRY_PASSWORD environment variable"
-  (if marcopolo-registry-password
-      marcopolo-registry-password
-    (getenv marcopolo--registry-password-key)))
-
-
-(defun marcopolo--get-hub-username ()
-  "Retrieve the Docker Hub username.
-Use `marcopolo-hub-username' or DOCKER_HUB_USERNAME environment variable"
-  (if marcopolo-hub-username
-      marcopolo-hub-username
-    (getenv marcopolo--hub-username-key)))
-
-(defun marcopolo--get-hub-password ()
-  "Retrieve the Docker Hub password.
-Use `marcopolo-hub-password' or DOCKER_HUB_PASSWORD environment variable"
-  (if marcopolo-hub-password
-      marcopolo-hub-password
-    (getenv marcopolo--hub-password-key)))
-
+(defun marcopolo-registry-status ()
+  "Status check for registry."
+  (marcopolo--request "GET" "_ping" nil 200 'registry))
 
 (provide 'marcopolo-api)
 ;;; marcopolo-api.el ends here

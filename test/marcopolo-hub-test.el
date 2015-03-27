@@ -27,13 +27,13 @@
 
 (ert-deftest test-marcopolo-hub-login ()
   (with-test-sandbox
-   (let ((response (marcopolo--hub-login)))
+   (let ((response (marcopolo-hub-login)))
      (should (string= "OK" response)))))
 
 (ert-deftest test-marcopolo-hub-repository-images ()
   (with-test-sandbox
    (let ((response
-          (marcopolo--hub-repository-images "nlamirault" "scame")))
+          (marcopolo-repository-images "nlamirault" "scame" 'hub)))
      ;;(message "Response: %s" response)
      (should (vectorp response))
      (mapc (lambda (image)

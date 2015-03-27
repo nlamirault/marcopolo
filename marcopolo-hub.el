@@ -24,25 +24,25 @@
 (require 'marcopolo-utils)
 
 
-(defun marcopolo--hub-login ()
-  "Try you login."
-  (marcopolo--perform-hub-request "GET" "users" nil 200))
+;; (defun marcopolo--hub-login ()
+;;   "Try you login."
+;;   (marcopolo--perform-hub-request "GET" "users" nil 200))
 
 
-(defun marcopolo--hub-search (term)
-  "Search the Docker Hub given a search `TERM'."
-  (let ((uri (s-concat "search?q=" term)))
-    (marcopolo--perform-hub-request "GET" uri nil 200)))
+;; (defun marcopolo--hub-search (term)
+;;   "Search the Docker Hub given a search `TERM'."
+;;   (let ((uri (s-concat "search?q=" term)))
+;;     (marcopolo--perform-hub-request "GET" uri nil 200)))
 
 
-(defun marcopolo--hub-repository-images (namespace repository)
-  "Get the images for a user repository.
-`NAMESPACE' is the namespace for the repository
-`REPOSITORY' is the name for the repository"
-  (let ((uri (s-concat "repositories/" namespace "/" repository "/images")))
-    (marcopolo--perform-hub-request "GET"
-                                    uri
-                                    nil 200)))
+;; (defun marcopolo--hub-repository-images (namespace repository)
+;;   "Get the images for a user repository.
+;; `NAMESPACE' is the namespace for the repository
+;; `REPOSITORY' is the name for the repository"
+;;   (let ((uri (s-concat "repositories/" namespace "/" repository "/images")))
+;;     (marcopolo--perform-hub-request "GET"
+;;                                     uri
+;;                                     nil 200)))
 
 
 ;; (defun marcopolo--hub-create-repository (namespace repository)

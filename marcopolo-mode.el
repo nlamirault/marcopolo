@@ -27,10 +27,8 @@
 (require 's)
 
 (require 'marcopolo-custom)
-(require 'marcopolo-hub)
-(require 'marcopolo-registry)
+(require 'marcopolo-api)
 (require 'marcopolo-ui)
-(require 'marcopolo-utils)
 
 
 ;; Customization
@@ -46,6 +44,7 @@
   "The Marcopolo buffer name."
   :type 'string
   :group 'marcopolo-mode)
+
 
 (defcustom marcopolo-padding 2
   "The number of columns used for padding on the left side of the buffer."
@@ -81,6 +80,9 @@
 
 ;; UI tools
 
+(defvar marcopolo-mode--repository-buffer nil
+  "Buffer being used to display repositiry informations.")
+
 
 (defun marcopolo--width ()
   "Return the width of the renderable content."
@@ -115,6 +117,28 @@ Optional argument `WIDTH-RIGHT' is the width of the right argument."
              (s-pad-left (length left) " " left)
              (s-pad-right (length right) " " right)))))
 
+
+(defun marcopolo--create-repository-window ()
+  "Create a new window for describing a Docker repository."
+  (let ((window
+         (condition-case er
+             (split-window (selected-window) 10 'below)
+           (error
+            ;; If the window is too small to split, use any one.
+            (if (string-match
+                 "Window #<window .*> too small for splitting"
+                 (car (cdr-safe er)))
+                (next-window)
+              (error (cdr er)))))))
+    ;; Configure the window to be closed on `q'.
+    (set-window-prev-buffers window nil)
+    (set-window-parameter window 'quit-restore
+                          ;; See (info "(elisp) Window Parameters")
+                          `(window window ,(selected-window) ,marcopolo-mode--repository-buffer))
+    window))
+
+
+
 ;; Rendering
 
 
@@ -131,9 +155,16 @@ Optional argument `WIDTH-RIGHT' is the width of the right argument."
     ""))
 
 (defun marcopolo--render-repository-informations (repository)
-  "Render all informatiosn about the `REPOSITORY'."
-  )
-
+  "Render a `REPOSITORY' informations to the repository buffer."
+  (marcopolo--render-row
+   (propertize (marcopolo--assoc-cdr 'name repository)
+               'face 'marcopolo-repository-name)
+   (propertize (marcopolo--assoc-cdr 'is-trusted repository)
+               'face 'marcopolo-repository-misc))
+  (marcopolo--render-row
+    (propertize (s-trim (marcopolo--assoc-cdr 'description repository))
+                'face 'marcopolo-repository-description)
+    ""))
 
 (defun marcopolo--render-repositories (repositories)
   "Render `REPOSITORIES'."
@@ -148,6 +179,38 @@ Optional argument `WIDTH-RIGHT' is the width of the right argument."
           (put-text-property start (point) :marcopolo-repository repository)))
     (widget-insert "\n")))
 
+
+(defun marcopolo-mode--display-repository-buffer (window)
+  "Display and return the buffer used for displaying a question.
+Create `marcopolo-mode--repository-buffer' if necessary.
+If WINDOW is given, use that to display the buffer."
+  ;; Create the buffer if necessary.
+  (unless (buffer-live-p marcopolo-mode--repository-buffer)
+    (setq marcopolo-mode--repository-buffer
+          (generate-new-buffer "*marcopolo-repository*")))
+  (cond
+   ;; Window was given, use it.
+   ((window-live-p window)
+    (set-window-buffer window marcopolo-mode--repository-buffer))
+   ;; No window, but the buffer is already being displayed somewhere.
+   ((get-buffer-window marcopolo-mode--repository-buffer 'visible))
+   ;; Neither, so we create the window.
+   (t (pop-to-buffer marcopolo-mode--repository-buffer)))
+  marcopolo-mode--repository-buffer)
+
+
+(defun marcopolo-mode--display-repository (repository &optional window)
+  "Display informations given by `REPOSITORY' on `WINDOW'.
+If `WINDOW' is nil, use selected one.
+
+Returns the repository buffer."
+  (with-current-buffer
+      (marcopolo-mode--display-repository-buffer window)
+    (let ((inhibit-read-only t))
+      (erase-buffer)
+      (marcopolo-mode)
+      (marcopolo--render-repository-informations repository)
+      (current-buffer))))
 
 
 ;; Mode
@@ -164,9 +227,12 @@ Optional argument `WIDTH-RIGHT' is the width of the right argument."
 
 (defun marcopolo-describe-repository ()
   "Display informations about the Docker repository at point."
+  (interactive)
   (let ((repository (marcopolo-current-repository)))
     (when repository
-      (marcopolo--render-repository-informations repository))))
+      (let ((window (get-buffer-window
+                     (marcopolo-mode--display-repository repository))))
+        (switch-to-buffer marcopolo-mode--repository-buffer)))))
 
 (defun marcopolo-current-repository ()
   "Return the current repository at point."
@@ -219,7 +285,7 @@ Optional argument `WIDTH-RIGHT' is the width of the right argument."
 
 (defvar marcopolo-mode-map
   (let ((map (make-keymap)))
-    ;;(define-key map (kbd "i") 'marcopolo-describe-repository)
+    (define-key map (kbd "d") 'marcopolo-describe-repository)
     (define-key map (kbd "p") 'marcopolo-prev-repository)
     (define-key map (kbd "n") 'marcopolo-next-repository)
     (define-key map (kbd "q") 'marcopolo-kill-buffer)
@@ -248,7 +314,7 @@ Optional argument `WIDTH-RIGHT' is the width of the right argument."
    (propertize "Docker repositories :")
    (condition-case err
        (marcopolo--render-repositories
-        (marcopolo--assoc-cdr 'results (marcopolo--registry-search term)))
+        (marcopolo--assoc-cdr 'results (marcopolo-search term 'registry)))
      (marcopolo-error
       (message "%s" (error-message-string err))))))
 
@@ -266,7 +332,7 @@ Optional argument `WIDTH-RIGHT' is the width of the right argument."
    (propertize "Docker repositories :")
    (condition-case err
        (marcopolo--render-repositories
-        (marcopolo--assoc-cdr 'results (marcopolo--hub-search term)))
+        (marcopolo--assoc-cdr 'results (marcopolo-search term 'hub)))
      (marcopolo-error
       (message "%s" (error-message-string err))))))
 

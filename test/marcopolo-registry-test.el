@@ -25,16 +25,17 @@
 ;;(require 'marcopolo)
 
 (ert-deftest test-marcopolo-registry-status ()
-  :tags '(registry current)
+  :tags '(registry)
   (with-test-sandbox
-   (let ((response (marcopolo--registry-status)))
+   (let ((response (marcopolo-registry-status)))
      (should (eql t response)))))
 
 
 (ert-deftest test-marcopolo-registry-search-ubuntu ()
   :tags '(registry)
   (with-test-sandbox
-   (let ((response (marcopolo--registry-search "emacs")))
+   ;;(let ((response (marcopolo--registry-search "emacs")))
+   (let ((response (marcopolo-search "emacs" 'registry)))
      ;;(message "Response: %s" response)
      (mapc (lambda (result)
              ;;(message "Result: %s" result)
@@ -48,7 +49,7 @@
   :tags '(registry)
   (with-test-sandbox
    (let ((response
-          (marcopolo--registry-repositories-tags "nlamirault" "scame")))
+          (marcopolo-repositories-tags "nlamirault" "scame" 'registry)))
      ;;(message "Response: %s" response)
      (should (vectorp response))
      (mapc (lambda (tag)
@@ -65,7 +66,7 @@
   :tags '(registry)
   (with-test-sandbox
    (let ((response
-          (marcopolo--registry-repository-tag-imageid "nlamirault" "scame" "0.6.0")))
+          (marcopolo-repository-tag-imageid "nlamirault" "scame" "0.6.0" 'registry)))
      ;; (message "Response: %s" response)
      (should (vectorp response))
      (mapc (lambda (r)
