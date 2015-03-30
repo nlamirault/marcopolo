@@ -83,6 +83,9 @@
 (defvar marcopolo-mode--repository-buffer nil
   "Buffer being used to display repositiry informations.")
 
+(defvar marcopolo-mode--docker-site nil
+  "Buffer local Docker site : 'hub or 'registry.")
+
 
 (defun marcopolo--width ()
   "Return the width of the renderable content."
@@ -156,6 +159,7 @@ Optional argument `WIDTH-RIGHT' is the width of the right argument."
 
 (defun marcopolo--render-repository-informations (repository)
   "Render a `REPOSITORY' informations to the repository buffer."
+  (message "Docker registry Site: %s" marcopolo-mode--docker-site)
   (marcopolo--render-row
    (propertize (marcopolo--assoc-cdr 'name repository)
                'face 'marcopolo-repository-name)
@@ -166,15 +170,19 @@ Optional argument `WIDTH-RIGHT' is the width of the right argument."
                 'face 'marcopolo-repository-description)
     "")
   (let* ((infos (s-split "/" (marcopolo--assoc-cdr 'name repository)))
-         (site 'registry)
+         (site marcopolo-mode--docker-site)
          (tags (marcopolo-repository-tags (car infos) (cadr infos) site))
          (images (marcopolo-repository-images (car infos) (cadr infos) site)))
     (marcopolo--render-row "\nTags:\n" "")
     (mapc (lambda (tag)
             (message "Tag: %s" tag)
-            (marcopolo--render-row
-             (propertize (symbol-name (car tag)) 'face 'marcopolo-repository-misc)
-             (cdr tag)))
+            (if (eql 'registry site)
+                (marcopolo--render-row
+                 (propertize (symbol-name (car tag)) 'face 'marcopolo-repository-misc)
+                 (cdr tag))
+              (marcopolo--render-row
+               (propertize (cdar tag) 'face 'marcopolo-repository-misc)
+               (cdadr tag))))
           tags)
     (marcopolo--render-row "\nImages:\n" "")
     (mapc (lambda (image)
@@ -187,6 +195,7 @@ Optional argument `WIDTH-RIGHT' is the width of the right argument."
 (defun marcopolo--render-repositories (repositories)
   "Render `REPOSITORIES'."
   ;;(message "Repositories: %s" repositories)
+  (message "Site: %s" marcopolo-mode--docker-site)
   (let ((start (point)))
     (cl-loop
      for n from 1 to (length repositories)
@@ -282,11 +291,12 @@ Returns the repository buffer."
 	  (if pos (goto-char pos)))))))
 
 
-(defmacro marcopolo--with-widget (title &rest body)
+(defmacro marcopolo--with-widget (title site &rest body)
   `(progn
      (set-buffer (get-buffer-create marcopolo-buffer))
      (switch-to-buffer-other-window marcopolo-buffer)
      (kill-all-local-variables)
+     (setq marcopolo-mode--docker-site ,site)
      (let ((inhibit-read-only t))
        (erase-buffer)
        (remove-overlays)
@@ -333,6 +343,7 @@ Returns the repository buffer."
                                'marcopolo-mode-history)))
   (marcopolo--with-widget
    (propertize "Docker registry repositories :")
+   'registry
    (condition-case err
        (marcopolo--render-repositories
         (marcopolo--assoc-cdr 'results (marcopolo-search term 'registry)))
@@ -351,6 +362,7 @@ Returns the repository buffer."
                                'marcopolo-mode-history)))
   (marcopolo--with-widget
    (propertize "Docker HUB repositories :")
+   'hub
    (condition-case err
        (marcopolo--render-repositories
         (marcopolo--assoc-cdr 'results (marcopolo-search term 'hub)))
