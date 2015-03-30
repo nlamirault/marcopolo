@@ -1,5 +1,10 @@
 # marcopolo ChangeLog
 
+# Version 0.4.0 (IN PROGRESS)
+
+- Describe Hub and own registry repositories
+- Refactoring Docker API
+
 # Version 0.3.0 (26/03/2015)
 
 - Refactoring authentication for Docker Hub and registry
