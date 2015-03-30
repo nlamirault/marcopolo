@@ -105,17 +105,17 @@ Optional argument `WIDTH-RIGHT' is the width of the right argument."
 			(- width-right 1)
 			(* 2 marcopolo-padding)))
 	 (padding (make-string marcopolo-padding ?\s)))
-    ;; (widget-insert (format
-    ;;     	    (format "%s%%-%s.%ss %%%s.%ss%s\n"
-    ;;     		    padding
-    ;;     		    width-left width-left
-    ;;     		    width-right width-right
-    ;;     		    padding)
-    ;;     	    left right))))
-    (widget-insert
-     (format "%s%s\n"
-             (s-pad-left (length left) " " left)
-             (s-pad-right (length right) " " right)))))
+    (widget-insert (format
+        	    (format "%s%%-%s.%ss %%%s.%ss%s\n"
+        		    padding
+        		    width-left width-left
+        		    width-right width-right
+        		    padding)
+        	    left right))))
+    ;; (widget-insert
+    ;;  (format "%s%s\n"
+    ;;          (s-pad-left (length left) " " left)
+    ;;          (s-pad-right (length right) " " right)))))
 
 
 (defun marcopolo--create-repository-window ()
@@ -164,7 +164,25 @@ Optional argument `WIDTH-RIGHT' is the width of the right argument."
   (marcopolo--render-row
     (propertize (s-trim (marcopolo--assoc-cdr 'description repository))
                 'face 'marcopolo-repository-description)
-    ""))
+    "")
+  (let* ((infos (s-split "/" (marcopolo--assoc-cdr 'name repository)))
+         (site 'registry)
+         (tags (marcopolo-repository-tags (car infos) (cadr infos) site))
+         (images (marcopolo-repository-images (car infos) (cadr infos) site)))
+    (marcopolo--render-row "\nTags:\n" "")
+    (mapc (lambda (tag)
+            (message "Tag: %s" tag)
+            (marcopolo--render-row
+             (propertize (symbol-name (car tag)) 'face 'marcopolo-repository-misc)
+             (cdr tag)))
+          tags)
+    (marcopolo--render-row "\nImages:\n" "")
+    (mapc (lambda (image)
+            (message "Image: %s" image)
+            (marcopolo--render-row
+             (propertize (cdar image) 'face 'marcopolo-repository-misc)
+             ""))
+          images)))
 
 (defun marcopolo--render-repositories (repositories)
   "Render `REPOSITORIES'."
@@ -219,11 +237,13 @@ Returns the repository buffer."
 (defun marcopolo-kill-buffer ()
   "Kill the `marcopolo-buffer' and delete the current window."
   (interactive)
-  (let ((buffer (get-buffer marcopolo-buffer)))
+  (let ((buffer (current-buffer)))
     (when (equal buffer (current-buffer))
-      (delete-window))
+      (unless (one-window-p)
+        (delete-window)))
     (when buffer
       (kill-buffer buffer))))
+
 
 (defun marcopolo-describe-repository ()
   "Display informations about the Docker repository at point."
@@ -233,6 +253,7 @@ Returns the repository buffer."
       (let ((window (get-buffer-window
                      (marcopolo-mode--display-repository repository))))
         (switch-to-buffer marcopolo-mode--repository-buffer)))))
+
 
 (defun marcopolo-current-repository ()
   "Return the current repository at point."
@@ -311,7 +332,7 @@ Returns the repository buffer."
                                nil
                                'marcopolo-mode-history)))
   (marcopolo--with-widget
-   (propertize "Docker repositories :")
+   (propertize "Docker registry repositories :")
    (condition-case err
        (marcopolo--render-repositories
         (marcopolo--assoc-cdr 'results (marcopolo-search term 'registry)))
@@ -329,7 +350,7 @@ Returns the repository buffer."
                                nil
                                'marcopolo-mode-history)))
   (marcopolo--with-widget
-   (propertize "Docker repositories :")
+   (propertize "Docker HUB repositories :")
    (condition-case err
        (marcopolo--render-repositories
         (marcopolo--assoc-cdr 'results (marcopolo-search term 'hub)))

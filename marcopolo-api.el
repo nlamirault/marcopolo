@@ -30,7 +30,7 @@
   (let ((uri (s-concat "search?q=" term)))
     (marcopolo--request "GET" uri nil 200 site)))
 
-(defun marcopolo-repositories-tags (namespace repository site)
+(defun marcopolo-repository-tags (namespace repository site)
   "Get all of the tags for the given repository.
 `NAMESPACE' is the namespace for the repository
 `REPOSITORY' is the name for the repository

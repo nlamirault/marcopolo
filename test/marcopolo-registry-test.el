@@ -49,7 +49,7 @@
   :tags '(registry)
   (with-test-sandbox
    (let ((response
-          (marcopolo-repositories-tags "nlamirault" "scame" 'registry)))
+          (marcopolo-repository-tags "nlamirault" "scame" 'registry)))
      ;;(message "Response: %s" response)
      (should (vectorp response))
      (mapc (lambda (tag)
