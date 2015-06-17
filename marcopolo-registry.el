@@ -1,4 +1,4 @@
-;;; marcopolo-api.el --- Marcopolo API settings.
+;;; marcopolo-registry.el --- Marcopolo Registry Client
 
 ;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
@@ -27,7 +27,6 @@
 (require 'marcopolo-utils)
 (require 'marcopolo-config)
 
-
 ;;
 ;; Docker Registry
 ;; -----------------------------------
@@ -53,19 +52,19 @@
   "A Docker registry could be : hub, v1 or v2.")
 
 
-(defmethod marcopolo-docker-get-uri ((registry marcopolo-docker) uri)
+(cl-defmethod marcopolo-docker-get-uri ((registry marcopolo-docker) uri)
   "Generate the HTTP request PATH for the Docker `REGISTRY' using `URI'."
   (with-slots (host version) registry
     (s-concat host "/" version "/" uri)))
 
 
-(defmethod marcopolo-docker-basic-auth ((registry marcopolo-docker))
+(cl-defmethod marcopolo-docker-basic-auth ((registry marcopolo-docker))
   "Generate the basic authentication token for the Docker `REGISTRY'."
   (with-slots (username password) registry
     (base64-encode-string (s-concat username ":" password))))
 
 
-(defmethod marcopolo-docker-http-headers ((registry marcopolo-docker))
+(cl-defmethod marcopolo-docker-http-headers ((registry marcopolo-docker))
   (list (cons "Accept" "application/json")
         (cons "Content-Type" "application/json")
         (cons "User-Agent"
@@ -77,7 +76,7 @@
                       (marcopolo-docker-basic-auth registry)))))
 
 
-(defmethod marcopolo--docker-request ((registry marcopolo-docker) method path params status-code)
+(cl-defmethod marcopolo--docker-request ((registry marcopolo-docker) method path params status-code)
   (let ((uri (marcopolo-docker-get-uri registry path))
         (headers (marcopolo-docker-http-headers registry)))
      (marcopolo--perform-http-request method uri headers params status-code)))
@@ -106,6 +105,7 @@ https://docs.docker.com/registry/overview/")
 
 
 (defun marcopolo-get-hub-client ()
+  "Return an instant of `marcopolo-hub'."
   (make-instance 'marcopolo-hub
                  :host marcopolo-hub-host
                  :version "v1"
@@ -113,6 +113,7 @@ https://docs.docker.com/registry/overview/")
                  :password (marcopolo--get-hub-password)))
 
 (defun marcopolo-get-registry-client ()
+  "Return an instant of `marcopolo-registry'."
   (if (string-equal "v1" (marcopolo--get-registry-version))
       (make-instance 'marcopolo-registry-v1
                      :host (marcopolo--get-registry-host)
@@ -130,11 +131,11 @@ https://docs.docker.com/registry/overview/")
 ;; -------------------
 
 
-(defmethod marcopolo-hub-login ((hub marcopolo-hub))
+(cl-defmethod marcopolo-hub-login ((hub marcopolo-hub))
   (marcopolo--docker-request hub "GET" "users" nil 200))
 
 
-(defmethod marcopolo-hub-user-repository-images ((hub marcopolo-hub) namespace repository)
+(cl-defmethod marcopolo-hub-user-repository-images ((hub marcopolo-hub) namespace repository)
   "Get the images for a user repository.
 `NAMESPACE' is the namespace for the repository
 `REPOSITORY' is the name for the repository"
@@ -142,7 +143,7 @@ https://docs.docker.com/registry/overview/")
     (marcopolo--docker-request hub "GET" uri nil 200)))
 
 
-(defmethod marcopolo-hub-search ((registry marcopolo-hub) term)
+(cl-defmethod marcopolo-hub-search ((registry marcopolo-hub) term)
   "Search `TERM'."
   (let ((uri (s-concat "search?q=" term)))
     (marcopolo--docker-request registry "GET" uri nil 200)))
@@ -152,17 +153,17 @@ https://docs.docker.com/registry/overview/")
 ;; -------------------
 
 
-(defmethod marcopolo-registry-status ((registry marcopolo-registry-v1))
+(cl-defmethod marcopolo-registry-status ((registry marcopolo-registry-v1))
   (marcopolo--docker-request registry "GET" "_ping" nil 200))
 
 
-(defmethod marcopolo-registry-search ((registry marcopolo-registry-v1) term)
+(cl-defmethod marcopolo-registry-search ((registry marcopolo-registry-v1) term)
   "Search `TERM'."
   (let ((uri (s-concat "search?q=" term)))
     (marcopolo--docker-request registry "GET" uri nil 200)))
 
 
-(defmethod marcopolo-registry-repository-tags ((registry marcopolo-registry-v1) namespace repository)
+(cl-defmethod marcopolo-registry-repository-tags ((registry marcopolo-registry-v1) namespace repository)
   "Get all of the tags for the given repository.
 `NAMESPACE' is the namespace for the repository
 `REPOSITORY' is the name for the repository"
@@ -177,7 +178,7 @@ https://docs.docker.com/registry/overview/")
 ;; ;;   (let ((uri (s-concat "repositories/" namespace "/" repository "/images")))
 ;; ;;     (marcopolo--request "GET" uri nil 200 site)))
 
-(defmethod marcopolo-registry-repository-tag-imageid ((registry marcopolo-registry-v1) namespace repository tag)
+(cl-defmethod marcopolo-registry-repository-tag-imageid ((registry marcopolo-registry-v1) namespace repository tag)
   "Get a tag for the given repository.
 `NAMESPACE' is the namespace for the repository
 `REPOSITORY' is the name for the repository
@@ -192,5 +193,5 @@ https://docs.docker.com/registry/overview/")
 ;;   (let ((uri (s-concat "images/" image-id "/json")))
 ;;     (marcopolo--request "GET" uri nil 200 site)))
 
-(provide 'marcopolo-api)
-;;; marcopolo-api.el ends here
+(provide 'marcopolo-registry)
+;;; marcopolo-registry.el ends here

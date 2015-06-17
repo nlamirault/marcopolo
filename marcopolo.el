@@ -48,9 +48,7 @@
 (require 'marcopolo-ui)
 (require 'marcopolo-utils)
 (require 'marcopolo-config)
-(require 'marcopolo-api)
 (require 'marcopolo-registry)
-(require 'marcopolo-hub)
 (require 'marcopolo-mode)
 
 (provide 'marcopolo)
