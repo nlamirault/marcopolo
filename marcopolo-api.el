@@ -67,11 +67,48 @@ See https://docs.docker.com/reference/api/docker_remote_api/")
               (marcopolo--docker-api-encode-auth client))))
 
 
-(cl-defmethod marcopolo--docker-api-version ((client marcopolo-api-client))
+;; Misc
+
+
+(cl-defmethod marcopolo--api-version ((client marcopolo-api-client))
   "Show the docker version information."
   (marcopolo--api-request "GET" "/version"))
 
 
+(cl-defmethod marcopolo--system-informations ((client marcopolo-api-client))
+  "Display system-wide information."
+  (marcopolo--api-request "GET" "/info"))
+
+
+(cl-defmethod marcopolo--ping ((client marcopolo-api-client))
+  "Ping the docker server."
+  (marcopolo--api-request "GET" "/_ping"))
+
+
+;; (cl-defmethod marcopolo--events ((client marcopolo-api-client))
+;;   "Get container events from docker, either in real time via streaming,
+;; or via polling."
+;;   (marcopolo--api-request "GET" "/events"))
+
+
+;; Containers
+
+
+(cl-defmethod marcopolo--list-containers ((client marcopolo-api-client) params)
+  "List containers.
+`PARAMS' is a CONS list '((key . value) (key . value))
+See: https://docs.docker.com/reference/api/docker_remote_api_v1.18/#list-containers"
+  (marcopolo--api-request "GET" "/containers/json" params))
+
+
+
+;; Images
+
+(cl-defmethod marcopolo--list-images ((client marcopolo-api-client) params)
+  "List images.
+`PARAMS' is a CONS list '((key . value) (key . value))
+See: https://docs.docker.com/reference/api/docker_remote_api_v1.18/#list-images"
+  (marcopolo--api-request "GET" "/images/json" params))
 
 
 (provide 'marcopolo-api)

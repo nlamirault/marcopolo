@@ -240,6 +240,39 @@ Returns the repository buffer."
       (current-buffer))))
 
 
+(defun marcopolo--render-image (image)
+  "Render a `IMAGE' to the Marcopolo buffer."
+  (let ((image-data (s-split ":" (elt (plist-get image :RepoTags) 0))))
+    (widget-insert
+     (format "%30s %10s %15s %10s\n"
+             (propertize (first image-data)
+                         ;; (plist-get image :Id)
+                         'face 'marcopolo-image-name)
+             (propertize (second image-data)
+                         ;; (format "%s" (plist-get image :RepoTags))
+                         'face 'marcopolo-repository-misc)
+             (propertize (format "%d" (plist-get image :VirtualSize))
+                         'face 'marcopolo-repository-description)
+             (propertize (format "%d" (plist-get image :Created))
+                         'face 'marcopolo-repository-misc)))))
+
+
+(defun marcopolo--render-images (images)
+  "Render `IMAGES'."
+  (let ((start (point)))
+    (widget-insert
+     (format "%30s %10s %15s %10s\n\n"
+             "Name" "Tag" "ID" "Created"))
+    (cl-loop
+     for n from 1 to (length images)
+     do (let ((image (elt images (- n 1)))
+              (start (point)))
+          (marcopolo--render-image image)
+          (put-text-property start (point) :marcopolo-image image)))
+    (widget-insert "\n")))
+
+
+
 ;; Mode
 
 
@@ -371,6 +404,20 @@ Returns the repository buffer."
        (marcopolo-error
         (message "%s" (error-message-string err)))))))
 
+
+
+;;;###autoload
+(defun marcopolo-docker-images ()
+  (interactive)
+  (let ((client (marcopolo-get-api-client)))
+    (marcopolo--with-widget
+     (propertize "Docker images :")
+     'client
+     (condition-case err
+         (marcopolo--render-images
+          (marcopolo--list-images client nil))
+       (marcopolo-error
+        (message "%s" (error-message-string err)))))))
 
 
 
