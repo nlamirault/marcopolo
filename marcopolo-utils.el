@@ -63,43 +63,6 @@ Defaults to `error'."
 
 ;; HTTP tools
 
-;; (defun marcopolo--get-rest-uri (uri site)
-;;   "Generate Docker REST request.
-;; `URI' is the REST request
-;; `SITE' could be 'registry or 'hub"
-;;   (let ((host (if (eql 'registry site)
-;;                   (marcopolo--get-registry-host)
-;;                 marcopolo-hub-host)))
-;;     (if host
-;;         (s-concat host "/" marcopolo--docker-api-version "/" uri)
-;;       (error (signal 'marcopolo-error '("Docker host unknown."))))))
-
-
-;; (defun marcopolo--create-basic-auth (username password)
-;;   "Create the BASIC AUTH value from `USERNAME' and `PASSWORD'."
-;;   (base64-encode-string (s-concat username ":" password)))
-
-;; (defun marcopolo--get-headers (site)
-;;   "Generate HTTP headers for Docker HUB or Registry.
-;; `SITE' could be 'registry or 'hub"
-;;   (let* ((username (if (eql 'registry site)
-;;                        (marcopolo--get-registry-username)
-;;                      (marcopolo--get-hub-username)))
-;;          (password (if (eql 'registry site)
-;;                        (marcopolo--get-registry-password)
-;;                      (marcopolo--get-hub-password)))
-;;          (headers
-;;           (list (cons "Accept" "application/json")
-;;                 (cons "Content-Type" "application/json")
-;;                 (cons "User-Agent"
-;;                       (s-concat marcopolo--user-agent
-;;                                 "/"
-;;                                 (marcopolo--library-version)))
-;;                 (cons "Authorization"
-;;                       (concat "Basic "
-;;                               (marcopolo--create-basic-auth username password))))))
-;;     headers))
-
 
 (defun marcopolo--perform-http-request (method uri headers params status-code)
   "Do a Docker API request.
@@ -127,21 +90,6 @@ raise an error."
        (signal 'marcopolo-http-error
                (list (request-response-status-code response)
                      (request-response-error-thrown response)))))))
-
-;; (defun marcopolo--request (method uri headers params status-code) ; site)
-;;   "Do a Docker API request.
-;; `METHOD' is the HTTPO method
-;; `URI' is the URI of the HTTP request
-;; `HEADERS` is the HTTP request headers
-;; `PARAMS' is a cons of HTTP parameters
-;; `STATUS-CODE' is the HTTP return desired code"
-;;   (marcopolo--perform-http-request method
-;;                                    uri
-;;                                    headers
-;;                                    ;;(marcopolo--get-rest-uri path site)
-;;                                    ;;(marcopolo--get-headers site)
-;;                                    params
-;;                                    status-code))
 
 
 ;; Assoc tools
