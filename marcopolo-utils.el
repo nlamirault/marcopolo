@@ -131,26 +131,34 @@ raise an error."
   (setq marcopolo--api-process-data nil)
   (setq marcopolo--api-process-finish nil)
   (let* ((docker-process (marcopolo--get-remote-api-process)))
+    (when marcopolo-debug
+      (message "[MarcoPolo] Process Request: %s" request))
     (process-send-string docker-process request)
     (while (not marcopolo--api-process-finish)
       (accept-process-output docker-process 5))
     marcopolo--api-process-data))
 
 
-(defun marcopolo--api-request (method path)
+(defun marcopolo--api-request (method path &optional params)
   "Send to Docker remote API a request.
 `METHOD' is the HTTP method
-`PATH': is the requested URI"
+`PATH': is the requested URI
+`PARAMS' is a CONS list of HTTP parameters"
   (when marcopolo-debug
-    (message "[MarcoPolo] API Request: %s %s" method path))
-  (let* ((request (format "%s %s HTTP/1.0\r\n\r\n" method path))
+    (message "[MarcoPolo] API Request: %s %s %s" method path params))
+  (let* ((uri (if params
+                  (s-concat path "?" (marcopolo--list-to-http-parameters params))
+                path))
+         (request (format "%s %s HTTP/1.0\r\n\r\n" method uri))
          (json-object-type 'plist)
          (output (marcopolo--api-process-request request)))
     (when marcopolo-debug
       (message "[MarcoPolo] API Response: %s" output))
-    ;; (let ((index (s-index-of "\r\n\r\n" output)))
-    ;;   (json-read-from-string (substring output (+ 4 index))))))
-    (marcopolo--docker-api-response-to-plist output)))
+    (if (s-contains? "application/json" output)
+        (progn
+          (message "JSON  content")
+          (marcopolo--docker-api-response-to-plist output))
+      (marcopolo--docker-api-response-to-text output))))
 
 
 ;; Assoc tools
@@ -170,6 +178,17 @@ raise an error."
         (json-object-type 'plist))
     (json-read-from-string (substring string (+ 4 index)))))
 
+(defun marcopolo--docker-api-response-to-text (string)
+  "Return the response text from `STRING' received from the Docker daemon."
+  (let ((index (s-index-of "\r\n\r\n" string)))
+    (substring string (+ 4 index))))
+
+
+(defun marcopolo--list-to-http-parameters (params)
+  "Transform `PARAMS' to parameters KEY=VALUE for HTTP request."
+  (s-join "&" (mapcar #'(lambda (param)
+                         (format "%s=%s" (car param) (cdr param)))
+                      params)))
 
 
 (provide 'marcopolo-utils)

@@ -22,6 +22,14 @@
 ;;; Code:
 
 
+(ert-deftest test-marcopolo-api-text-to-string ()
+  :tags '(utils current)
+  (with-test-sandbox
+   (let* ((output "HTTP/1.0 200 OK\nDate: Wed, 17 Jun 2015 12:54:45 GMT\nContent-Length: 2\nContent-Type: text/plain; charset=utf-8\n\nOK\n")
+          (text (marcopolo--docker-api-response-to-text output)))
+     (should (string-equal "OK\n" text)))))
+
+
 (ert-deftest test-marcopolo-api-json-to-plist ()
   :tags '(utils)
   (with-test-sandbox
@@ -34,6 +42,17 @@
      (should (string-equal "4749651" (plist-get json :GitCommit)))
      (should (string-equal "amd64" (plist-get json :Arch)))
      (should (string-equal "1.18" (plist-get json :ApiVersion))))))
+
+
+(ert-deftest test-marcopolo-list-to-http-parameters ()
+  :tags '(utils)
+  (with-test-sandbox
+   (let* ((params '((size . 3)
+                    ("foo" . "bar")
+                    ("hello" . "world")))
+          (request (marcopolo--list-to-http-parameters params)))
+     (should (string-equal "size=3&foo=bar&hello=world" request)))))
+
 
 
 (provide 'marcopolo-utils-test)
