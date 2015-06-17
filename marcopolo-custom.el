@@ -50,6 +50,11 @@
   :type 'string
   :group 'marcopolo)
 
+(defcustom marcopolo-registry-version nil
+  "The Docker registry API version."
+  :type 'string
+  :group 'marcopolo)
+
 (defcustom marcopolo-registry-username nil
   "Username for the Docker Registry."
   :type 'string

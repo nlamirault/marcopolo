@@ -27,6 +27,7 @@ or [Cask][]:
 * Configure marcopolo in Elisp :
 
         (setq marcopolo-registry-host "https://docker.foobar.com"
+              marcopolo-registry-version "v1"
               marcopolo-registry-username "xxx"
               marcopolo-registry-password "yyy"
               marcopolo-hub-username "aaa"

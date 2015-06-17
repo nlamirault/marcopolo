@@ -1,6 +1,6 @@
-;;; marcopolo-api-test.el --- Tests for API commons
+;;; marcopolo-config-test.el --- Tests for Marcopolo configuration
 
-;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -21,7 +21,6 @@
 
 ;;; Code:
 
-;;(require 'marcopolo-api)
 
 (defun check-marcopolo-settings-from-environment (var value fct)
   (let ((backup (getenv var)))
@@ -31,44 +30,90 @@
           (should (string= value (funcall fct))))
       (setenv var backup))))
 
-(ert-deftest test-marcopolo-get-username-from-environment ()
-  :tags '(api)
+
+;; Hub
+
+(ert-deftest test-marcopolo-get-hub-username-from-environment ()
+  :tags '(config)
   (with-test-sandbox
    (check-marcopolo-settings-from-environment
     marcopolo--hub-username-key "foo" 'marcopolo--get-hub-username)))
 
-(ert-deftest test-marcopolo-get-username-from-conf ()
-  :tags '(api)
+(ert-deftest test-marcopolo-get-hub-username-from-conf ()
+  :tags '(config)
   (with-test-sandbox
    (let* ((value "foo")
           (marcopolo-hub-username value))
      (should (string= value (marcopolo--get-hub-username))))))
 
-(ert-deftest test-marcopolo-get-password-from-environment ()
-  :tags '(api)
+(ert-deftest test-marcopolo-get-hub-password-from-environment ()
+  :tags '(config)
   (with-test-sandbox
    (check-marcopolo-settings-from-environment
     marcopolo--hub-password-key "bar" 'marcopolo--get-hub-password)))
 
-(ert-deftest test-marcopolo-get-password-from-conf ()
-  :tags '(api)
+(ert-deftest test-marcopolo-get-hub-password-from-conf ()
+  :tags '(config)
   (with-test-sandbox
    (let* ((value "bar")
           (marcopolo-hub-password value))
      (should (string= value (marcopolo--get-hub-password))))))
 
+
+;; Registry
+
+(ert-deftest test-marcopolo-get-registry-username-from-environment ()
+  :tags '(config)
+  (with-test-sandbox
+   (check-marcopolo-settings-from-environment
+    marcopolo--registry-username-key "foo" 'marcopolo--get-registry-username)))
+
+(ert-deftest test-marcopolo-get-registry-username-from-conf ()
+  :tags '(config)
+  (with-test-sandbox
+   (let* ((value "foo")
+          (marcopolo-registry-username value))
+     (should (string= value (marcopolo--get-registry-username))))))
+
+(ert-deftest test-marcopolo-get-registry-password-from-environment ()
+  :tags '(config)
+  (with-test-sandbox
+   (check-marcopolo-settings-from-environment
+    marcopolo--registry-password-key "bar" 'marcopolo--get-registry-password)))
+
+(ert-deftest test-marcopolo-get-registry-password-from-conf ()
+  :tags '(config)
+  (with-test-sandbox
+   (let* ((value "bar")
+          (marcopolo-registry-password value))
+     (should (string= value (marcopolo--get-registry-password))))))
+
 (ert-deftest test-marcopolo-get-registry-host-from-environment ()
-  :tags '(api)
+  :tags '(config)
   (with-test-sandbox
    (check-marcopolo-settings-from-environment
     marcopolo--registry-host-key "http://localhost:8989" 'marcopolo--get-registry-host)))
 
 (ert-deftest test-marcopolo-get-registry-host-from-conf ()
-  :tags '(api)
+  :tags '(config)
   (with-test-sandbox
    (let* ((value "http://localhost:7878")
           (marcopolo-registry-host value))
      (should (string= value (marcopolo--get-registry-host))))))
 
-(provide 'marcopolo-api-test)
-;;; marcopolo-api-test.el ends here
+(ert-deftest test-marcopolo-get-registry-version-from-environment ()
+  :tags '(config)
+  (with-test-sandbox
+   (check-marcopolo-settings-from-environment
+    marcopolo--registry-version-key "v2" 'marcopolo--get-registry-version)))
+
+(ert-deftest test-marcopolo-get-registry-version-from-conf ()
+  :tags '(config)
+  (with-test-sandbox
+   (let* ((value "v2")
+          (marcopolo-registry-version value))
+     (should (string= value (marcopolo--get-registry-version))))))
+
+
+(provide 'marcopolo-config-test)
+;;; marcopolo-config-test.el ends here

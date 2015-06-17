@@ -22,18 +22,19 @@
 ;;; Code:
 
 
-;;(require 'marcopolo)
-
-
 (ert-deftest test-marcopolo-hub-login ()
+  :tags '(hub)
   (with-test-sandbox
-   (let ((response (marcopolo-hub-login)))
+   (let* ((hub (marcopolo-get-hub-client))
+          (response (marcopolo-hub-login hub)))
      (should (string= "OK" response)))))
 
 (ert-deftest test-marcopolo-hub-repository-images ()
+  :tags '(hub)
   (with-test-sandbox
-   (let ((response
-          (marcopolo-repository-images "nlamirault" "scame" 'hub)))
+   (let* ((hub (marcopolo-get-hub-client))
+         (response
+          (marcopolo-hub-user-repository-images hub "nlamirault" "scame")))
      ;;(message "Response: %s" response)
      (should (vectorp response))
      (mapc (lambda (image)

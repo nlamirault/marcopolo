@@ -333,7 +333,7 @@ Returns the repository buffer."
 ;; API
 
 ;;;###autoload
-(defun marcopolo-registry-search (term)
+(defun marcopolo-mode-registry-search (term)
   "Search from Docker registry repositories using `TERM' request."
   (interactive
    (list (read-from-minibuffer "Search: "
@@ -341,18 +341,19 @@ Returns the repository buffer."
                                nil
                                nil
                                'marcopolo-mode-history)))
-  (marcopolo--with-widget
-   (propertize "Docker registry repositories :")
-   'registry
-   (condition-case err
-       (marcopolo--render-repositories
-        (marcopolo--assoc-cdr 'results (marcopolo-search term 'registry)))
-     (marcopolo-error
-      (message "%s" (error-message-string err))))))
+  (let ((registry (marcopolo-get-registry-client)))
+    (marcopolo--with-widget
+     (propertize "Docker registry repositories :")
+     'registry
+     (condition-case err
+         (marcopolo--render-repositories
+          (marcopolo--assoc-cdr 'results (marcopolo-registry-search registry term)))
+       (marcopolo-error
+        (message "%s" (error-message-string err)))))))
 
 
 ;;;###autoload
-(defun marcopolo-hub-search (term)
+(defun marcopolo-mode-hub-search (term)
   "Search from Docker Hub repositories using `TERM' request."
   (interactive
    (list (read-from-minibuffer "Search: "
@@ -360,14 +361,15 @@ Returns the repository buffer."
                                nil
                                nil
                                'marcopolo-mode-history)))
-  (marcopolo--with-widget
-   (propertize "Docker HUB repositories :")
-   'hub
-   (condition-case err
-       (marcopolo--render-repositories
-        (marcopolo--assoc-cdr 'results (marcopolo-search term 'hub)))
-     (marcopolo-error
-      (message "%s" (error-message-string err))))))
+  (let ((hub (marcopolo-get-hub-client)))
+    (marcopolo--with-widget
+     (propertize "Docker HUB repositories :")
+     'hub
+     (condition-case err
+         (marcopolo--render-repositories
+          (marcopolo--assoc-cdr 'results (marcopolo-hub-search hub term)))
+       (marcopolo-error
+        (message "%s" (error-message-string err)))))))
 
 
 

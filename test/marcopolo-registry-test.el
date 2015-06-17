@@ -22,20 +22,20 @@
 ;;; Code:
 
 
-;;(require 'marcopolo)
 
 (ert-deftest test-marcopolo-registry-status ()
   :tags '(registry)
   (with-test-sandbox
-   (let ((response (marcopolo-registry-status)))
+   (let* ((registry (marcopolo-get-registry-client))
+         (response (marcopolo-registry-status registry)))
      (should (eql t response)))))
 
 
 (ert-deftest test-marcopolo-registry-search-ubuntu ()
   :tags '(registry)
   (with-test-sandbox
-   ;;(let ((response (marcopolo--registry-search "emacs")))
-   (let ((response (marcopolo-search "emacs" 'registry)))
+   (let* ((registry (marcopolo-get-registry-client))
+          (response (marcopolo-registry-search registry "emacs")))
      ;;(message "Response: %s" response)
      (mapc (lambda (result)
              ;;(message "Result: %s" result)
@@ -48,8 +48,9 @@
 (ert-deftest test-marcopolo-registry-repository-tags ()
   :tags '(registry)
   (with-test-sandbox
-   (let ((response
-          (marcopolo-repository-tags "nlamirault" "scame" 'registry)))
+   (let* ((registry (marcopolo-get-registry-client))
+          (response
+           (marcopolo-registry-repository-tags registry "nlamirault" "scame")))
      ;;(message "Response: %s" response)
      (should (vectorp response))
      (mapc (lambda (tag)
@@ -65,8 +66,9 @@
 (ert-deftest test-marcopolo-registry-repository-tag ()
   :tags '(registry)
   (with-test-sandbox
-   (let ((response
-          (marcopolo-repository-tag-imageid "nlamirault" "scame" "0.6.0" 'registry)))
+   (let* ((registry (marcopolo-get-registry-client))
+          (response
+           (marcopolo-registry-repository-tag-imageid registry "nlamirault" "scame" "0.6.0")))
      ;; (message "Response: %s" response)
      (should (vectorp response))
      (mapc (lambda (r)
@@ -75,6 +77,7 @@
              (should (not (s-blank? (assoc-default 'id r)))))
            response)
      )))
+
 
 (provide 'marcopolo-registry-test)
 ;;; marcopolo-registry-test.el ends here

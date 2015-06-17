@@ -37,6 +37,9 @@
 (defconst marcopolo--registry-host-key "DOCKER_REGISTRY_HOST"
   "Environment variable name for DOCKER_REGISTRY_HOST.")
 
+(defconst marcopolo--registry-version-key "DOCKER_REGISTRY_VERSION"
+  "Environment variable name for DOCKER_REGISTRY_VERSION.")
+
 (defconst marcopolo--registry-username-key "DOCKER_REGISTRY_USERNAME"
   "Environment variable name for DOCKER_REGISTRY_USERNAME.")
 
