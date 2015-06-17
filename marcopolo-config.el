@@ -67,7 +67,19 @@ Use `marcopolo-hub-password' or DOCKER_HUB_PASSWORD environment variable"
       marcopolo-hub-password
     (getenv marcopolo--hub-password-key)))
 
+(defun marcopolo--get-api-username ()
+  "Retrieve the Docker remote API username.
+Use `marcopolo-docker-username' or DOCKER_API_USERNAME environment variable"
+  (if marcopolo-docker-username
+      marcopolo-docker-username
+    (getenv marcopolo--docker-api-username-key)))
 
+(defun marcopolo--get-api-password ()
+  "Retrieve the Docker remote API password.
+Use `marcopolo-docker-password' or DOCKER_API_PASSWORD environment variable"
+  (if marcopolo-docker-password
+      marcopolo-docker-password
+    (getenv marcopolo--docker-api-password-key)))
 
 (provide 'marcopolo-config)
 ;;; marcopolo-config.el ends here

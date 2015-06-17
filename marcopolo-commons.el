@@ -25,14 +25,15 @@
 (defconst marcopolo--user-agent "marcopolo"
   "The user agent for Marcopolo.")
 
-(defconst marcopolo--docker-api-version "v1"
-  "The Docker API version.")
+(defconst marcopolo--docker-api-version "v1.18"
+  "The Docker API version.
+See: https://docs.docker.com/reference/api/docker_remote_api/")
 
 (defconst marcopolo--hub-username-key "DOCKER_HUB_USERNAME"
   "Environment variable name for DOCKER_HUB_USERNAME.")
 
 (defconst marcopolo--hub-password-key "DOCKER_HUB_PASSWORD"
-  "Environment variable name for DOCKER_HUB_USERNAME.")
+  "Environment variable name for DOCKER_HUB_PASSWORD.")
 
 (defconst marcopolo--registry-host-key "DOCKER_REGISTRY_HOST"
   "Environment variable name for DOCKER_REGISTRY_HOST.")
@@ -44,7 +45,13 @@
   "Environment variable name for DOCKER_REGISTRY_USERNAME.")
 
 (defconst marcopolo--registry-password-key "DOCKER_REGISTRY_PASSWORD"
-  "Environment variable name for DOCKER_REGISTRY_USERNAME.")
+  "Environment variable name for DOCKER_REGISTRY_PASSWORD.")
+
+(defconst marcopolo--docker-api-username-key "DOCKER_API_USERNAME"
+  "Environment variable name for DOCKER_API_USERNAME.")
+
+(defconst marcopolo--docker-api-password-key "DOCKER_API_PASSWORD"
+  "Environment variable name for DOCKER_API_PASSWORD.")
 
 
 (provide 'marcopolo-commons)

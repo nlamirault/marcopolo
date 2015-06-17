@@ -23,7 +23,7 @@
 
 (require 'eieio)
 
-
+(require 'marcopolo-custom)
 (require 'marcopolo-utils)
 (require 'marcopolo-config)
 
@@ -105,7 +105,7 @@ https://docs.docker.com/registry/overview/")
 
 
 (defun marcopolo-get-hub-client ()
-  "Return an instant of `marcopolo-hub'."
+  "Return an instance of `marcopolo-hub'."
   (make-instance 'marcopolo-hub
                  :host marcopolo-hub-host
                  :version "v1"
@@ -113,7 +113,7 @@ https://docs.docker.com/registry/overview/")
                  :password (marcopolo--get-hub-password)))
 
 (defun marcopolo-get-registry-client ()
-  "Return an instant of `marcopolo-registry'."
+  "Return an instance of `marcopolo-registry'."
   (if (string-equal "v1" (marcopolo--get-registry-version))
       (make-instance 'marcopolo-registry-v1
                      :host (marcopolo--get-registry-host)

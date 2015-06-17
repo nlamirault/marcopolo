@@ -92,7 +92,69 @@ raise an error."
                      (request-response-error-thrown response)))))))
 
 
+
+;; Network tools
+
+(defvar marcopolo--api-process-data nil)
+
+(defvar marcopolo--api-process-finish nil)
+
+(defconst marcopolo--api-process-name "marcopolo-api")
+
+(defconst marcopolo--api-process-buffer "*marcopolo-api*")
+
+
+(defun marcopolo--api-process-filter (process msg)
+  (setq marcopolo--api-process-data
+        (concat marcopolo--api-process-data msg)))
+
+
+(defun marcopolo--api-process-sentinel (process msg)
+  (when (memq (process-status process) '(closed exit signal))
+    (setq marcopolo--api-process-finish t)))
+
+
+(defun marcopolo--get-remote-api-process ()
+  "Retrieve or create the process to communicate with the Docker daemon."
+  (or (get-buffer-process marcopolo--api-process-buffer)
+      (make-network-process :name marcopolo--api-process-name
+                            :buffer marcopolo--api-process-buffer
+                            :family 'local
+                            :host nil
+                            :service "/var/run/docker.sock"
+                            :sentinel 'marcopolo--api-process-sentinel
+                            :filter 'marcopolo--api-process-filter)))
+
+
+(defun marcopolo--api-process-request (request)
+  "Send to the Docker daemon the API `REQUEST'."
+  (setq marcopolo--api-process-data nil)
+  (setq marcopolo--api-process-finish nil)
+  (let* ((docker-process (marcopolo--get-remote-api-process)))
+    (process-send-string docker-process request)
+    (while (not marcopolo--api-process-finish)
+      (accept-process-output docker-process 5))
+    marcopolo--api-process-data))
+
+
+(defun marcopolo--api-request (method path)
+  "Send to Docker remote API a request.
+`METHOD' is the HTTP method
+`PATH': is the requested URI"
+  (when marcopolo-debug
+    (message "[MarcoPolo] API Request: %s %s" method path))
+  (let* ((request (format "%s %s HTTP/1.0\r\n\r\n" method path))
+         (json-object-type 'plist)
+         (output (marcopolo--api-process-request request)))
+    (when marcopolo-debug
+      (message "[MarcoPolo] API Response: %s" output))
+    ;; (let ((index (s-index-of "\r\n\r\n" output)))
+    ;;   (json-read-from-string (substring output (+ 4 index))))))
+    (marcopolo--docker-api-response-to-plist output)))
+
+
 ;; Assoc tools
+
 
 (defun marcopolo--assoc-cdr (key list)
   "Return value of `KEY' into `LIST' otherwise an empty string."
@@ -100,6 +162,14 @@ raise an error."
     (if result
         result
       "")))
+
+
+(defun marcopolo--docker-api-response-to-plist (string)
+  "Return a `PLIST' from `STRING' received from the Docker daemon."
+  (let ((index (s-index-of "\r\n\r\n" string))
+        (json-object-type 'plist))
+    (json-read-from-string (substring string (+ 4 index)))))
+
 
 
 (provide 'marcopolo-utils)

@@ -49,6 +49,7 @@
 (require 'marcopolo-utils)
 (require 'marcopolo-config)
 (require 'marcopolo-registry)
+(require 'marcopolo-api)
 (require 'marcopolo-mode)
 
 (provide 'marcopolo)

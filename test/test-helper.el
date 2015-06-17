@@ -82,15 +82,24 @@
 
 
 (defmacro with-docker-env (&rest body)
+  "Save environments variables, execute `BODY' and restore variables."
   `(let ((registry (getenv "DOCKER_REGISTRY_HOST"))
-         (username (getenv "DOCKER_REGISTRY_USERNAME"))
-         (password (getenv "DOCKER_REGISTRY_PASSWORD")))
+         (registry-username (getenv "DOCKER_REGISTRY_USERNAME"))
+         (registry-password (getenv "DOCKER_REGISTRY_PASSWORD"))
+         (hub-username (getenv "DOCKER_HUB_USERNAME"))
+         (hub-password (getenv "DOCKER_HUB_PASSWORD"))
+         (api-username (getenv "DOCKER_API_USERNAME"))
+         (api-password (getenv "DOCKER_API_PASSWORD")))
      (unwind-protect
          (setenv "DOCKER_REGISTRY_HOST" "https://registry.hub.docker.com")
          ,@body
        (setenv "DOCKER_REGISTRY_HOST" registry)
-       (setenv "DOCKER_REGISTRY_USERNAME" username)
-       (setenv "DOCKER_REGISTRY_PASSWORD" password))))
+       (setenv "DOCKER_REGISTRY_USERNAME" registry-username)
+       (setenv "DOCKER_REGISTRY_PASSWORD" registry-password)
+       (setenv "DOCKER_HUB_USERNAME" hub-username)
+       (setenv "DOCKER_HUB_PASSWORD" hub-password)
+       (setenv "DOCKER_API_USERNAME" api-username)
+       (setenv "DOCKER_API_PASSWORD" api-password))))
 
 
 (defmacro with-test-sandbox (&rest body)

@@ -65,6 +65,16 @@
   :type 'string
   :group 'marcopolo)
 
+(defcustom marcopolo-docker-username nil
+  "Username for the Docker remote API."
+  :type 'string
+  :group 'marcopolo)
+
+(defcustom marcopolo-docker-password nil
+  "Password for the Docker remote API."
+  :type 'string
+  :group 'marcopolo)
+
 (defcustom marcopolo-debug t
   "Enable or not some logs."
   :type 'string
