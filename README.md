@@ -2,8 +2,8 @@
 
 [![travis][badge-travis]][travis]
 [![drone][badge-drone]][drone]
-[![Melpa Status](http://melpa.milkbox.net/packages/marcopolo-badge.svg)](http://melpa.milkbox.net/#/marcopolo)
-[![MELPA Stable](http://stable.melpa.org/packages/marcopolo-badge.svg)](http://stable.melpa.org/#/marcopolo)
+[![Melpa](https://melpa.org/packages/marcopolo-badge.svg)](http://melpa.milkbox.net/#/marcopolo)
+[![Melpa Stable](https://stable.melpa.org/packages/marcopolo-badge.svg)](http://stable.melpa.org/#/marcopolo)
 [![Coverage Status](https://coveralls.io/repos/nlamirault/marcopolo/badge.png)](https://coveralls.io/r/nlamirault/marcopolo)
 
 `marcopolo` provides :
@@ -113,7 +113,7 @@ Nicolas Lamirault <nicolas.lamirault@gmail.com>
 [Issue tracker]: https://github.com/nlamirault/marcopolo/issues
 
 [GNU Emacs]: https://www.gnu.org/software/emacs/
-[MELPA]: http://melpa.milkbox.net/
+[MELPA]: https://melpa.org
 [Cask]: http://cask.github.io/
 [Helm]: https://github.com/emacs-helm/helm
 [Overseer]: https://github.com/tonini/overseer.el
