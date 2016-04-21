@@ -1,6 +1,6 @@
 ;;; marcopolo-utils.el --- some tools
 
-;; Copyright (C) 2014, 2015 Nicolas Lamirault <nicolas.lamirault@gmail.com>
+;; Copyright (C) 2014, 2015, 2016 Nicolas Lamirault <nicolas.lamirault@gmail.com>
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License
@@ -27,37 +27,8 @@
 
 
 (require 'marcopolo-api)
+(require 'marcopolo-errors)
 (require 'marcopolo-version)
-
-
-;; Errors
-
-(eval-and-compile
-  (unless (fboundp 'define-error)
-    ;; Shamelessly copied from Emacs trunk :)
-    (defun define-error (name message &optional parent)
-      "Define NAME as a new error signal.
-MESSAGE is a string that will be output to the echo area if such an error
-is signaled without being caught by a `condition-case'.
-PARENT is either a signal or a list of signals from which it inherits.
-Defaults to `error'."
-      (unless parent (setq parent 'error))
-      (let ((conditions
-             (if (consp parent)
-                 (apply #'nconc
-                        (mapcar (lambda (parent)
-                                  (cons parent
-                                        (or (get parent 'error-conditions)
-                                            (error "Unknown signal `%s'" parent))))
-                                parent))
-               (cons parent (get parent 'error-conditions)))))
-        (put name 'error-conditions
-             (delete-dups (copy-sequence (cons name conditions))))
-        (when message (put name 'error-message message))))))
-
-(define-error 'marcopolo-error "Marcopolo error")
-
-(define-error 'marcopolo-http-error "HTTP Error" 'marcopolo-error)
 
 
 ;; HTTP tools
@@ -69,6 +40,7 @@ Defaults to `error'."
     (if host
         (s-concat host "/" marcopolo--docker-api-version "/" uri)
       (error (signal 'marcopolo-error '("Docker registry host unknown."))))))
+
 
 (defun marcopolo--get-hub-rest-uri (uri)
   "Retrieve the Docker Hub complete url.
@@ -128,12 +100,18 @@ raise an error."
                            :sync t
                            :data params
                            :parser 'json-read)))
-    (if (= status-code (request-response-status-code response))
-        (request-response-data response)
-      (error
-       (signal 'marcopolo-http-error
-               (list (request-response-status-code response)
-                     (request-response-error-thrown response)))))))
+    (let ((response-code (request-response-status-code response)))
+      (if (null response-code)
+          (error
+           (signal 'marcopolo-http-error
+                   (list (request-response-error-thrown response))))
+        (if (= status-code response-code)
+            (request-response-data response)
+          (error
+           (signal 'marcopolo-http-error
+                   (list (request-response-status-code response)
+                         (request-response-error-thrown response)))))))))
+
 
 (defun marcopolo--perform-registry-request (method path params status-code)
   (marcopolo--perform-http-request method
@@ -148,6 +126,14 @@ raise an error."
                                    (marcopolo--get-hub-headers)
                                    params
                                    status-code))
+
+
+(defmacro marcopolo--with-request (&rest body)
+  `(unwind-protect
+       (condition-case err
+           (progn ,@body)
+         (marcopolo-http-error
+          (message "[Marcopolo] %s" (error-message-string err))))))
 
 ;; Assoc tools
 
