@@ -1,4 +1,4 @@
-;;; marcopolo.el --- Emacs client to the Docker HUB API
+;;; marcopolo.el --- Emacs client to the Docker HUB/Registry API
 
 ;; Author: Nicolas Lamirault <nicolas.lamirault@gmail.com>
 ;; URL: https://github.com/nlamirault/marcopolo
