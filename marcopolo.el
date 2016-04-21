@@ -1,4 +1,4 @@
-;;; marcopolo.el --- Emacs client for Docker API
+;;; marcopolo.el --- Emacs client to the Docker HUB API
 
 ;; Author: Nicolas Lamirault <nicolas.lamirault@gmail.com>
 ;; URL: https://github.com/nlamirault/marcopolo
@@ -26,7 +26,7 @@
 
 ;;; Commentary:
 
-;; Provides a Docker API client for Emacs.
+;; Provides a Docker HUB API client for Emacs.
 
 ;;; Installation:
 
