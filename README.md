@@ -6,6 +6,11 @@
 [![MELPA Stable](http://stable.melpa.org/packages/marcopolo-badge.svg)](http://stable.melpa.org/#/marcopolo)
 [![Coverage Status](https://coveralls.io/repos/nlamirault/marcopolo/badge.png)](https://coveralls.io/r/nlamirault/marcopolo)
 
+# DEPRECATED
+
+See: https://github.com/Silex/docker.el
+
+
 `marcopolo` provides :
 * a REST client to the Docker registry / Hub API
 
